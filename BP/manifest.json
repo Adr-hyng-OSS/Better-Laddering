@@ -1,0 +1,74 @@
+{
+    "format_version": 2,
+    "header": {
+        "name": "Better Ladders BP 1.0.0 [DEBUG]",
+        "description": "Better Ladders: Bedrock Edition\n @Made By: https://twitter.com/h_YanG_0A",
+        "uuid": "958690f0-1e23-4b9b-bd66-b924eaa17a3e",
+        "version": [
+            1,
+            0,
+            0
+        ],
+        "min_engine_version": [
+            1,
+            20,
+            0
+        ]
+    },
+    "modules": [
+        {
+            "description": "item and entity definitions",
+            "type": "data",
+            "uuid": "f45553bf-7b24-49cc-b836-358d0a410de2",
+            "version": [
+                1,
+                0,
+                0
+            ]
+        },
+        {
+            "description": "scripts",
+            "type": "script",
+            "language": "javascript",
+            "uuid": "259cf0c5-23ea-40d1-a9da-8c6e9850b2ce",
+            "version": [
+                1,
+                0,
+                0
+            ],
+            "entry": "scripts/main.js"
+        }
+    ],
+    "capabilities": [
+        "script_eval"
+    ],
+    "dependencies": [
+        {
+            "module_name": "@minecraft/server",
+            "version": "1.3.0-beta"
+        },
+        {
+            "module_name": "@minecraft/server-ui",
+            "version": "1.1.0-beta"
+        },
+        {
+            "module_name": "@minecraft/server-admin",
+            "version": "1.0.0-beta"
+        },
+        {
+            "uuid": "42979c96-954e-45e5-8f1b-0823cc01eead",
+            "version": [
+                1,
+                0,
+                0
+            ]
+        }
+    ],
+    "metadata": {
+        "authors": [
+            "@h_YanG_0A"
+        ],
+        "license": "GPL-3.0-or-later",
+        "url": "https://twitter.com/h_YanG_0A"
+    }
+}
