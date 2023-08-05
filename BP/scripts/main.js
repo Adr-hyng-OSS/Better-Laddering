@@ -1,5 +1,5 @@
-import { BlockPermutation, Direction, EntityEquipmentInventoryComponent, EquipmentSlot, MinecraftBlockTypes, system, world } from "@minecraft/server";
-import { Logger, getBlockFromRayFiltered, isInExcludedBlocks, setCardinalBlock, setLadderSupport } from "./packages";
+import { Direction, EntityEquipmentInventoryComponent, EquipmentSlot, MinecraftBlockTypes, system, world } from "@minecraft/server";
+import { getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadderPart, setCardinalBlock, setLadderSupport } from "./packages";
 const logMap = new Map();
 /**
  * Features:
@@ -7,7 +7,7 @@ const logMap = new Map();
  * * To break all ladders above or below, hold ladder, and destroy a ladder.
  *
  * ? ToDO:
- * * You can put ladders above ceiling, and below floor.
+ * * Ladder Support is destroyable like ladder. When you destroy it, it destroys the ladder also.
  */
 world.afterEvents.blockBreak.subscribe(async (event) => {
     const blockDestroyed = event.block;
@@ -50,24 +50,38 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
     logMap.set(player.name, Date.now());
     if ((oldLog + 150) >= Date.now())
         return;
-    Logger.warn("Meow", _blockPlaced.typeId, blockInteractedFace);
+    const { y: yRot } = player.getRotation();
+    const playerCardinalFacing = getCardinalFacing(yRot);
+    const { x, y, z } = _blockPlaced.location;
     system.run(async () => {
         if (Direction.up === blockInteractedFace) {
-            const { x, y, z } = _blockPlaced.location;
-            _blockPlaced = _blockPlaced.dimension.getBlock({ x, y: y + 1, z });
-            Logger.warn("UP");
+            if (isLadderPart(_blockPlaced))
+                return;
+            const initialOffset = _blockPlaced.isSolid() && !isInExcludedBlocks(_blockPlaced.typeId) ? 1 : 0;
+            _blockPlaced = _blockPlaced.dimension.getBlock({ x, y: y + initialOffset, z });
+            if (isLadderPart(_blockPlaced))
+                return;
             player.runCommand(`clear @s ladder -1 1`);
+            setLadderSupport(_blockPlaced, playerCardinalFacing);
             await new Promise((resolve) => {
-                _blockPlaced.setType(MinecraftBlockTypes.ladder);
-                // Use player's angle to determine ladder's facing direction
-                const perm = BlockPermutation.resolve(_blockPlaced.typeId).withState("facing_direction", 1);
-                _blockPlaced.setPermutation(perm);
+                setCardinalBlock(_blockPlaced, playerCardinalFacing, MinecraftBlockTypes.ladder);
                 resolve();
             });
             return;
         }
         else if (Direction.down === blockInteractedFace) {
-            Logger.warn("DOWN");
+            if (isLadderPart(_blockPlaced))
+                return;
+            const initialOffset = _blockPlaced.isSolid() && !isInExcludedBlocks(_blockPlaced.typeId) ? 1 : 0;
+            _blockPlaced = _blockPlaced.dimension.getBlock({ x, y: y - initialOffset, z });
+            if (isLadderPart(_blockPlaced))
+                return;
+            player.runCommand(`clear @s ladder -1 1`);
+            setLadderSupport(_blockPlaced, playerCardinalFacing);
+            await new Promise((resolve) => {
+                setCardinalBlock(_blockPlaced, playerCardinalFacing, MinecraftBlockTypes.ladder);
+                resolve();
+            });
             return;
         }
         else {
@@ -85,7 +99,7 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
                 player.runCommand(`clear @s ladder -1 1`);
                 setLadderSupport(availableBlock, blockFace);
                 await new Promise((resolve) => {
-                    setCardinalBlock(availableBlock, blockFace);
+                    setCardinalBlock(availableBlock, blockFace, MinecraftBlockTypes.ladder);
                     resolve();
                 });
             }
@@ -98,7 +112,7 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
                 player.runCommand(`clear @s ladder -1 1`);
                 setLadderSupport(availableBlock, blockFace);
                 await new Promise((resolve) => {
-                    setCardinalBlock(availableBlock, blockFace);
+                    setCardinalBlock(availableBlock, blockFace, MinecraftBlockTypes.ladder);
                     resolve();
                 });
             }

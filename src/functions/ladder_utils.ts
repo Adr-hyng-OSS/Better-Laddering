@@ -63,6 +63,7 @@ function isInExcludedBlocks(blockID: string): boolean {
     'minecraft:bell',
     'minecraft:chain',
     '.*azalea',
+    'yn:fake_wall_block',
     'minecraft:bed',
   ];
 
@@ -72,19 +73,22 @@ function isInExcludedBlocks(blockID: string): boolean {
   return combinedPattern.test(blockID.replace(/["|']/g, ''));
 }
 
-function setCardinalBlock(block: Block, face: number): void {
-    block.setType(MinecraftBlockTypes.ladder)
-    const perm: BlockPermutation = BlockPermutation.resolve(block.typeId).withState("facing_direction", face);
+function setCardinalBlock(block: Block, face: number, blockReplace: BlockType): void {
+    const facing_direction_selector = (blockReplace === MinecraftBlockTypes.ladder) ? "facing_direction" : "yn:facing_direction";
+    block.setType(blockReplace)
+    const perm: BlockPermutation = BlockPermutation.resolve(block.typeId).withState(facing_direction_selector, face);
     block.setPermutation(perm);
 }
 
 function setLadderSupport(block: Block, face: number): void {
-    const directionOffset = LadderSupportDirection.get(face as number);
+    const directionOffset = LadderSupportDirection.get(face);
     const supportOffset: Vector3 = Vector.add(block.location, directionOffset);
     const supportBlock = block.dimension.getBlock(supportOffset);
     if(!supportBlock.isSolid() && !isInExcludedBlocks(supportBlock.typeId)){
-        setCardinalBlock(supportBlock, face as number);
+        setCardinalBlock(supportBlock, face, MinecraftBlockTypes.get("yn:fake_wall_block"));
     }
 }
 
-export {getBlockFromRayFiltered, isInExcludedBlocks, LadderSupportDirection, setCardinalBlock, setLadderSupport};
+const isLadderPart = (blockPlaced: Block) => (blockPlaced.type === MinecraftBlockTypes.ladder || blockPlaced.type === MinecraftBlockTypes.get("yn:fake_wall_block"));
+
+export {getBlockFromRayFiltered, isInExcludedBlocks, LadderSupportDirection, setCardinalBlock, setLadderSupport, isLadderPart};
