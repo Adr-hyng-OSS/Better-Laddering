@@ -1,6 +1,6 @@
 import config from "./config";
 export * from "./config";
-export * from "./logger";
+export * from "./classes/logger";
 export * from "./functions/ladder_utils";
 export * from "./functions/utils";
 
@@ -9,9 +9,9 @@ export * from "./functions/utils";
 const {
     debug, 
     disableLadderGriefing,
-    excludedBlocksToGrief,
-    includedBlocksToGrief
+    includedGriefBlocks,
+    excludedGriefBlocks
 } = config;
 
 
-export {debug, disableLadderGriefing, excludedBlocksToGrief, includedBlocksToGrief};
+export {debug, disableLadderGriefing, includedGriefBlocks, excludedGriefBlocks};

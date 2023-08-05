@@ -8,6 +8,7 @@ const logMap = new Map();
  *
  * ? ToDO:
  * * Ladder Support is destroyable like ladder. When you destroy it, it destroys the ladder also.
+ *
  */
 world.afterEvents.blockBreak.subscribe(async (event) => {
     const blockDestroyed = event.block;
@@ -17,7 +18,7 @@ world.afterEvents.blockBreak.subscribe(async (event) => {
     const dimension = event.dimension;
     if (blockPermutation.type.id !== MinecraftBlockTypes.ladder.id)
         return;
-    if (heldItem.typeId !== MinecraftBlockTypes.ladder.id)
+    if (heldItem?.typeId !== MinecraftBlockTypes.ladder.id)
         return;
     let laddersDestroyed = 0;
     if (!player.isSneaking) {
@@ -61,6 +62,8 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
             _blockPlaced = _blockPlaced.dimension.getBlock({ x, y: y + initialOffset, z });
             if (isLadderPart(_blockPlaced))
                 return;
+            if (_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId))
+                return;
             player.runCommand(`clear @s ladder -1 1`);
             setLadderSupport(_blockPlaced, playerCardinalFacing);
             await new Promise((resolve) => {
@@ -75,6 +78,8 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
             const initialOffset = _blockPlaced.isSolid() && !isInExcludedBlocks(_blockPlaced.typeId) ? 1 : 0;
             _blockPlaced = _blockPlaced.dimension.getBlock({ x, y: y - initialOffset, z });
             if (isLadderPart(_blockPlaced))
+                return;
+            if (_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId))
                 return;
             player.runCommand(`clear @s ladder -1 1`);
             setLadderSupport(_blockPlaced, playerCardinalFacing);

@@ -2,7 +2,7 @@ export default {
   /**
    * Enables debug messages to content logs.
    */
-  debug: true,
+  debug: false,
   /**
    * Allow's ladders to replace non-fully solid face blocks like stairs, doors, etc. Here's a list of blocks that can be forced destroyed when placing ladder above, and back of ladder as support:
    * 1. .*_fence
@@ -33,15 +33,15 @@ export default {
    * 26. .*azalea
    * 27. minecraft:bed
    */
-  disableLadderGriefing: false,
+  disableLadderGriefing: true,
   /**
-   * List of blocks (format: 'namespace:blockName') that can be griefed by the Better Ladder addon's behavior
+   * List of blocks that you want to be griefed, when disableLadderGriefing is true or ON. (Supports Regex)
    */
-  includedBlocksToGrief: [],
+  excludedGriefBlocks: [],
   /**
-   * (Supports Regex) List of blocks (format: 'namespace:blockName') that can't be griefed by the Better Ladder addon's behavior
+   * List of blocks that you don't want to be griefed, when disableLadderGriefing is true or ON. (Supports Regex)
    */
-  excludedBlocksToGrief: [],
+  includedGriefBlocks: [],
 };
 
 // version (do not change)

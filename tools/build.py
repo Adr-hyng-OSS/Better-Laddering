@@ -12,7 +12,7 @@ args = parser.parse_args()
 
 addon_name = json.loads(open('setup/mc_manifest.json', 'r').read()).get("header").get("bp_name")
 build_pack_name = addon_name[:addon_name.rfind(" BP")]
-version_tag = 'v1.0.0'
+version_tag = 'v1.0.1'
 
 def handleError(err):
     if err: exit(err)
@@ -133,6 +133,7 @@ if args.target != 'debug':
 """
 Add:
 - [--init | -i] make it have choices of ["beh", "res", "all"] to select what to init
+- version should be auto-generated from scripts module.
 - [--module | -m] to select what module of script to use for BP-stable. choices: ["v1.20.0", "v1.20.1", "v1.20.10"]
 
 Bugs:

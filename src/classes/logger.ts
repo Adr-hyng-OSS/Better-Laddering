@@ -1,4 +1,4 @@
-import { debug } from "packages";
+import { debug } from "../packages";
 
 type LogLevel = "info" | "warn" | "error";
 

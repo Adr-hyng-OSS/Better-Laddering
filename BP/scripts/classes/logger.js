@@ -1,4 +1,4 @@
-import { debug } from "packages";
+import { debug } from "../packages";
 class Logger {
     static log(level, ...data) {
         Logger.debug = debug;

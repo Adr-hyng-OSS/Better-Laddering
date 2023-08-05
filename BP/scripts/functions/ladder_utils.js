@@ -1,5 +1,5 @@
 import { BlockPermutation, MinecraftBlockTypes, Vector } from "@minecraft/server";
-import { disableLadderGriefing, excludedBlocksToGrief, includedBlocksToGrief } from "../packages";
+import { disableLadderGriefing, excludedGriefBlocks, includedGriefBlocks } from "../packages";
 const LadderSupportDirection = new Map([
     [2, { x: 0, y: 0, z: 1 }],
     [3, { x: 0, y: 0, z: -1 }],
@@ -61,8 +61,8 @@ function isInExcludedBlocks(blockID) {
         'yn:fake_wall_block',
         'minecraft:bed',
     ];
-    let patterns = [...currentPatterns, ...includedBlocksToGrief];
-    patterns = patterns.filter(pattern => !excludedBlocksToGrief.includes(pattern));
+    let patterns = [...currentPatterns, ...includedGriefBlocks];
+    patterns = patterns.filter(pattern => !excludedGriefBlocks.includes(pattern));
     const combinedPattern = new RegExp(patterns.join('|'));
     return combinedPattern.test(blockID.replace(/["|']/g, ''));
 }

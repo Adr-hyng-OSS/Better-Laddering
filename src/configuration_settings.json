@@ -1,14 +1,14 @@
 {
   "disableLadderGriefing": {
     "description": "Allow's ladders to replace non-fully solid face blocks like stairs, doors, etc. Here's a list of blocks that can be forced destroyed when placing ladder above, and back of ladder as support:\n1. .*_fence\n2. .*_stairs\n3. .*_trapdoor\n4. .*_door\n5. .*_hanging_sign\n6. .*wall_banner\n7. minecraft:mangrove_roots\n8. minecraft:daylight_detector\n9. .*leaves\n10. .*campfire\n11. minecraft:enchanting_table\n12. .*chest\n13. .*portal\n14. minecraft:mob_spawner\n15. .*_wall\n16. .*_slab\n17. .*lantern\n18. minecraft:stonecutter.*\n19. minecraft:grindstone\n20. minecraft:iron_bars\n21. minecraft:brewing_stand\n22. minecraft:cauldron\n23. minecraft:hopper\n24. minecraft:bell\n25. minecraft:chain\n26. .*azalea\n27. minecraft:bed",
-    "default": false
+    "default": true
   },
-  "includedBlocksToGrief": {
-    "description": "List of blocks (format: 'namespace:blockName') that can be griefed by the Better Ladder addon's behavior",
+  "excludedGriefBlocks": {
+    "description": "List of blocks that you want to be griefed, when disableLadderGriefing is true or ON. (Supports Regex)",
     "default": []
   },
-  "excludedBlocksToGrief": {
-    "description": "(Supports Regex) List of blocks (format: 'namespace:blockName') that can't be griefed by the Better Ladder addon's behavior",
+  "includedGriefBlocks": {
+    "description": "List of blocks that you don't want to be griefed, when disableLadderGriefing is true or ON. (Supports Regex)",
     "default": []
   }
 }

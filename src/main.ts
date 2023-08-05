@@ -1,5 +1,5 @@
-import { Block, BlockBreakAfterEvent, BlockPermutation, Dimension, Direction, EntityEquipmentInventoryComponent, EquipmentSlot, ItemStack, ItemUseOnAfterEvent, MinecraftBlockTypes, Player, Vector, Vector3, system, world } from "@minecraft/server";
-import { Logger, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadderPart, setCardinalBlock, setLadderSupport } from "./packages";
+import { Block, BlockBreakAfterEvent, BlockPermutation, Dimension, Direction, EntityEquipmentInventoryComponent, EquipmentSlot, ItemStack, ItemUseOnAfterEvent, MinecraftBlockTypes, Player, system, world } from "@minecraft/server";
+import { getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadderPart, setCardinalBlock, setLadderSupport } from "./packages";
 
 const logMap: Map<string, number> = new Map<string, number>();
 
@@ -10,6 +10,7 @@ const logMap: Map<string, number> = new Map<string, number>();
  * 
  * ? ToDO:
  * * Ladder Support is destroyable like ladder. When you destroy it, it destroys the ladder also.
+ * 
  */
 
 world.afterEvents.blockBreak.subscribe(async (event: BlockBreakAfterEvent) => {
@@ -19,7 +20,7 @@ world.afterEvents.blockBreak.subscribe(async (event: BlockBreakAfterEvent) => {
     const heldItem: ItemStack = (player.getComponent(EntityEquipmentInventoryComponent.componentId) as EntityEquipmentInventoryComponent).getEquipment(EquipmentSlot.mainhand);
     const dimension: Dimension = event.dimension;
     if(blockPermutation.type.id !== MinecraftBlockTypes.ladder.id) return;
-    if(heldItem.typeId !== MinecraftBlockTypes.ladder.id) return;
+    if(heldItem?.typeId !== MinecraftBlockTypes.ladder.id) return;
 		let laddersDestroyed: number = 0;
     if(!player.isSneaking) {
         const {x, y, z} = blockDestroyed.location;
@@ -59,6 +60,7 @@ world.beforeEvents.itemUseOn.subscribe((event: ItemUseOnAfterEvent) => {
 				const initialOffset = _blockPlaced.isSolid() && !isInExcludedBlocks(_blockPlaced.typeId) ? 1 : 0;
 				_blockPlaced = _blockPlaced.dimension.getBlock({x, y: y + initialOffset, z});
 				if(isLadderPart(_blockPlaced)) return;
+				if(_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId)) return;
 				player.runCommand(`clear @s ladder -1 1`);
 				setLadderSupport(_blockPlaced, playerCardinalFacing);
 				await new Promise<void>((resolve) => {
@@ -72,6 +74,7 @@ world.beforeEvents.itemUseOn.subscribe((event: ItemUseOnAfterEvent) => {
 				const initialOffset = _blockPlaced.isSolid() && !isInExcludedBlocks(_blockPlaced.typeId) ? 1 : 0;
 				_blockPlaced = _blockPlaced.dimension.getBlock({x, y: y - initialOffset, z});
 				if(isLadderPart(_blockPlaced)) return;
+				if(_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId)) return;
 				player.runCommand(`clear @s ladder -1 1`);
 				setLadderSupport(_blockPlaced, playerCardinalFacing);
 				await new Promise<void>((resolve) => {
