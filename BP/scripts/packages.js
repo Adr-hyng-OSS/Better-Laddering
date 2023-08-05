@@ -1,5 +1,7 @@
 import config from "./config";
 export * from "./config";
 export * from "./logger";
-const { debug, showParticle } = config;
-export { debug, showParticle };
+export * from "./functions/ladder_utils";
+export * from "./functions/utils";
+const { debug, disableLadderGriefing, excludedBlocksToGrief, includedBlocksToGrief } = config;
+export { debug, disableLadderGriefing, excludedBlocksToGrief, includedBlocksToGrief };

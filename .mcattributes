@@ -2,3 +2,6 @@ diagnostic.disable.minecraft.manifest.module.missing=true
 diagnostic.disable.molang.context.missing=true
 diagnostic.disable.=true
 diagnostic.disable.minecraft.manifest.version.minimum=true
+diagnostic.disable.behaviorpack.block.components.deprecated=true
+diagnostic.disable.json.invalid=true
+diagnostic.disable.513=true

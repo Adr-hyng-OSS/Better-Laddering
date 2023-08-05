@@ -1,0 +1,256 @@
+{
+  "format_version": "1.16.100",
+  "minecraft:block": {
+    "description": {
+      "identifier": "yn:fake_wall_block",
+      "properties": {
+        "yn:facing_direction": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
+    },
+    "permutations": [
+      {
+        "condition": "query.block_property('yn:facing_direction') == 2",
+        "components": {
+          "minecraft:geometry": "geometry.ladder_support_face_rotated",
+          "minecraft:entity_collision": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              1,
+              16,
+              16
+            ]
+          },
+          "minecraft:pick_collision": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              1,
+              16,
+              16
+            ]
+          },
+          "minecraft:rotation": [
+            0,
+            90,
+            0
+          ]
+        }
+      },
+      {
+        "condition": "query.block_property('yn:facing_direction') == 3",
+        "components": {
+          "minecraft:geometry": "geometry.ladder_support_face_rotated",
+          "minecraft:entity_collision": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              1,
+              16,
+              16
+            ]
+          },
+          "minecraft:pick_collision": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              1,
+              16,
+              16
+            ]
+          },
+          "minecraft:rotation": [
+            0,
+            -90,
+            0
+          ]
+        }
+      },
+      {
+        "condition": "query.block_property('yn:facing_direction') == 4",
+        "components": {
+          "minecraft:geometry": "geometry.ladder_support_face_rotated",
+          "minecraft:entity_collision": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              1,
+              16,
+              16
+            ]
+          },
+          "minecraft:pick_collision": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              1,
+              16,
+              16
+            ]
+          },
+          "minecraft:rotation": [
+            0,
+            180,
+            0
+          ]
+        }
+      },
+      {
+        "condition": "query.block_property('yn:facing_direction') == 5",
+        "components": {
+          "minecraft:geometry": "geometry.ladder_support_face_rotated",
+          "minecraft:entity_collision": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              1,
+              16,
+              16
+            ]
+          },
+          "minecraft:pick_collision": {
+            "origin": [
+              -8,
+              0,
+              -8
+            ],
+            "size": [
+              1,
+              16,
+              16
+            ]
+          },
+          "minecraft:rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    ],
+    "components": {
+      "minecraft:geometry": "geometry.ladder_support_face_default",
+      "minecraft:on_player_placing": {
+        "event": "set_facing_direction"
+      },
+			"minecraft:material_instances": {
+				"*": {
+					"texture": "empty",
+					"render_method": "alpha_test"
+				}
+			},
+      "minecraft:creative_category": {
+        "category": "construction",
+        "group": "itemGroup.name.walls"
+      },
+      "minecraft:entity_collision": {
+        "origin": [
+          -8,
+          0,
+          -8
+        ],
+        "size": [
+          16,
+          16,
+          1
+        ]
+      },
+      "minecraft:pick_collision": {
+        "origin": [
+          -8,
+          0,
+          -8
+        ],
+        "size": [
+          16,
+          16,
+          1
+        ]
+      },
+      "minecraft:queued_ticking": {
+        "on_tick": {
+          "event": "update"
+        },
+        "interval_range": [10,10],
+        "looping": true
+      },
+      "minecraft:block_light_absorption": 0,
+      "minecraft:destructible_by_explosion": false,
+      "minecraft:destructible_by_mining": false,
+      "minecraft:map_color": "#f0b030"
+    },
+    "events": {
+			"update": {
+        "sequence": [
+          {
+            "condition": "query.block_property('yn:facing_direction') == 2",
+            "run_command": {
+              "command": "execute positioned ~~~ unless block ~~~-1 ladder [\"facing_direction\": 2] run setblock ~~~ air[] replace",
+              "target": "self"
+            }
+          },
+          {
+            "condition": "query.block_property('yn:facing_direction') == 3",
+            "run_command": {
+              "command": "execute positioned ~~~ unless block ~~~1 ladder [\"facing_direction\": 3] run setblock ~~~ air[] replace",
+              "target": "self"
+            }
+          },
+          {
+            "condition": "query.block_property('yn:facing_direction') == 4",
+            "run_command": {
+              "command": "execute positioned ~~~ unless block ~-1~~ ladder [\"facing_direction\": 4] run setblock ~~~ air[] replace",
+              "target": "self"
+            }
+          },
+          {
+            "condition": "query.block_property('yn:facing_direction') == 5",
+            "run_command": {
+              "command": "execute positioned ~~~ unless block ~1~~ ladder [\"facing_direction\": 5] run setblock ~~~ air[] replace",
+              "target": "self"
+            }
+          },
+          {
+            "run_command": {
+              "command": "execute as @p[r=5, hasitem={location=slot.weapon.mainhand, item=yn:fake_wall_block}] run particle minecraft:heart_particle ~~~",
+              "target": "self"
+            }
+          }
+        ]
+			},
+      "set_facing_direction": {
+        "set_block_property": {
+          "yn:facing_direction": "query.cardinal_facing_2d"
+        }
+      }
+    }
+  }
+}
