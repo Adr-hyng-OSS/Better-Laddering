@@ -1,5 +1,5 @@
 import { BlockPermutation, MinecraftBlockTypes, Vector } from "@minecraft/server";
-import { disableLadderGriefing, excludedGriefBlocks, includedGriefBlocks } from "../packages";
+import { disableLadderGriefing, griefableBlocks, nonGriefableBlocks } from "../packages";
 const LadderSupportDirection = new Map([
     [2, { x: 0, y: 0, z: 1 }],
     [3, { x: 0, y: 0, z: -1 }],
@@ -11,7 +11,7 @@ const LadderSupportDirection = new Map([
  * @param block {Block}
  * @param directionVector {Vector3}
  * @param RayFilterOptions {RayFilterOptions}
- * @returns
+ * @returns {Block | null}
  */
 function getBlockFromRayFiltered(block, directionVector, RayFilterOptions = { maxDistance: 385 }) {
     let { x, y, z } = block.location;
@@ -61,8 +61,8 @@ function isInExcludedBlocks(blockID) {
         'yn:fake_wall_block',
         'minecraft:bed',
     ];
-    let patterns = [...currentPatterns, ...includedGriefBlocks];
-    patterns = patterns.filter(pattern => !excludedGriefBlocks.includes(pattern));
+    let patterns = [...currentPatterns, ...nonGriefableBlocks];
+    patterns = patterns.filter(pattern => !griefableBlocks.includes(pattern));
     const combinedPattern = new RegExp(patterns.join('|'));
     return combinedPattern.test(blockID.replace(/["|']/g, ''));
 }

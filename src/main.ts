@@ -1,5 +1,5 @@
-import { Block, BlockBreakAfterEvent, BlockPermutation, Dimension, Direction, EntityEquipmentInventoryComponent, EquipmentSlot, ItemStack, ItemUseOnAfterEvent, MinecraftBlockTypes, Player, system, world } from "@minecraft/server";
-import { getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadderPart, setCardinalBlock, setLadderSupport } from "./packages";
+import { Block, BlockBreakAfterEvent, BlockPermutation, Container, Dimension, Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, ItemStack, ItemUseOnAfterEvent, MinecraftBlockTypes, MinecraftItemTypes, Player, system, world } from "@minecraft/server";
+import { CInventory, Logger, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadderPart, setCardinalBlock, setLadderSupport } from "./packages";
 
 const logMap: Map<string, number> = new Map<string, number>();
 
@@ -22,6 +22,7 @@ world.afterEvents.blockBreak.subscribe(async (event: BlockBreakAfterEvent) => {
     if(blockPermutation.type.id !== MinecraftBlockTypes.ladder.id) return;
     if(heldItem?.typeId !== MinecraftBlockTypes.ladder.id) return;
 		let laddersDestroyed: number = 0;
+		const inventory = (player.getComponent(EntityInventoryComponent.componentId) as EntityInventoryComponent).container;
     if(!player.isSneaking) {
         const {x, y, z} = blockDestroyed.location;
         const lastLadderBlock: Block = getBlockFromRayFiltered(dimension.getBlock({x, y: y + 1, z}), {x: 0, y: 1, z: 0}, {filteredBlocks: MinecraftBlockTypes.ladder});
@@ -29,7 +30,8 @@ world.afterEvents.blockBreak.subscribe(async (event: BlockBreakAfterEvent) => {
             laddersDestroyed = dimension.fillBlocks(blockDestroyed.location, lastLadderBlock.location, MinecraftBlockTypes.air, {matchingBlock: blockPermutation});
             resolve();
         });
-				player.runCommand(`give @s ladder ${laddersDestroyed}`);
+				inventory.addItem(new ItemStack(MinecraftItemTypes.ladder, laddersDestroyed));
+		// player.runCommand(`give @s ladder ${laddersDestroyed}`);
     }
     else if(player.isSneaking) {
         const {x, y, z} = blockDestroyed.location;
@@ -38,7 +40,7 @@ world.afterEvents.blockBreak.subscribe(async (event: BlockBreakAfterEvent) => {
             laddersDestroyed = dimension.fillBlocks(blockDestroyed.location, lastLadderBlock.location, MinecraftBlockTypes.air, {matchingBlock: blockPermutation});
             resolve();
         });
-				player.runCommand(`give @s ladder ${laddersDestroyed}`);
+				inventory.addItem(new ItemStack(MinecraftItemTypes.ladder, laddersDestroyed));
     }
 });
 
@@ -86,7 +88,7 @@ world.beforeEvents.itemUseOn.subscribe((event: ItemUseOnAfterEvent) => {
 				if(_blockPlaced.typeId !== "minecraft:ladder") return;
 				const blockFace: number = (_blockPlaced.permutation.getState("facing_direction")?.valueOf() as number) ?? undefined;
 				if(blockFace === undefined) return;
-					
+				
 				if(!player.isSneaking) {
 					const availableBlock: Block = getBlockFromRayFiltered(_blockPlaced, {x: 0, y: 1, z: 0}, {filteredBlocks: MinecraftBlockTypes.ladder});
 					if(!availableBlock) return;

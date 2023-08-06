@@ -1,5 +1,5 @@
 import { Block, BlockPermutation, BlockType, MinecraftBlockTypes, Vector, Vector3 } from "@minecraft/server";
-import { disableLadderGriefing, excludedGriefBlocks, includedGriefBlocks } from "../packages";
+import { disableLadderGriefing, griefableBlocks, nonGriefableBlocks } from "../packages";
 
 const LadderSupportDirection: Map<number, Vector3> = new Map([
     [2, {x: 0, y: 0, z: 1}],
@@ -18,7 +18,7 @@ type RayFilterOptions = {
  * @param block {Block}
  * @param directionVector {Vector3}
  * @param RayFilterOptions {RayFilterOptions}
- * @returns 
+ * @returns {Block | null}
  */
 function getBlockFromRayFiltered(block: Block, directionVector: Vector3, RayFilterOptions: RayFilterOptions = {maxDistance: 385}): Block | null {
     let {x, y, z} = block.location;
@@ -67,15 +67,15 @@ function isInExcludedBlocks(blockID: string): boolean {
     'minecraft:bed',
   ];
 
-  let patterns: string[] = [...currentPatterns, ...includedGriefBlocks];
-  patterns = patterns.filter(pattern => !excludedGriefBlocks.includes(pattern));
+  let patterns: string[] = [...currentPatterns, ...nonGriefableBlocks];
+  patterns = patterns.filter(pattern => !griefableBlocks.includes(pattern));
   const combinedPattern = new RegExp(patterns.join('|'));
   return combinedPattern.test(blockID.replace(/["|']/g, ''));
 }
 
 function setCardinalBlock(block: Block, face: number, blockReplace: BlockType): void {
     const facing_direction_selector = (blockReplace === MinecraftBlockTypes.ladder) ? "facing_direction" : "yn:facing_direction";
-    block.setType(blockReplace)
+    block.setType(blockReplace);
     const perm: BlockPermutation = BlockPermutation.resolve(block.typeId).withState(facing_direction_selector, face);
     block.setPermutation(perm);
 }

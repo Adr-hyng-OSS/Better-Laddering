@@ -5,3 +5,4 @@ diagnostic.disable.minecraft.manifest.version.minimum=true
 diagnostic.disable.behaviorpack.block.components.deprecated=true
 diagnostic.disable.json.invalid=true
 diagnostic.disable.513=true
+diagnostic.disable.resourcepack.texture.missing=true

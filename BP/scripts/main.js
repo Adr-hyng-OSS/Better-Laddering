@@ -1,4 +1,4 @@
-import { Direction, EntityEquipmentInventoryComponent, EquipmentSlot, MinecraftBlockTypes, system, world } from "@minecraft/server";
+import { Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, ItemStack, MinecraftBlockTypes, MinecraftItemTypes, system, world } from "@minecraft/server";
 import { getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadderPart, setCardinalBlock, setLadderSupport } from "./packages";
 const logMap = new Map();
 /**
@@ -21,6 +21,7 @@ world.afterEvents.blockBreak.subscribe(async (event) => {
     if (heldItem?.typeId !== MinecraftBlockTypes.ladder.id)
         return;
     let laddersDestroyed = 0;
+    const inventory = player.getComponent(EntityInventoryComponent.componentId).container;
     if (!player.isSneaking) {
         const { x, y, z } = blockDestroyed.location;
         const lastLadderBlock = getBlockFromRayFiltered(dimension.getBlock({ x, y: y + 1, z }), { x: 0, y: 1, z: 0 }, { filteredBlocks: MinecraftBlockTypes.ladder });
@@ -28,7 +29,8 @@ world.afterEvents.blockBreak.subscribe(async (event) => {
             laddersDestroyed = dimension.fillBlocks(blockDestroyed.location, lastLadderBlock.location, MinecraftBlockTypes.air, { matchingBlock: blockPermutation });
             resolve();
         });
-        player.runCommand(`give @s ladder ${laddersDestroyed}`);
+        inventory.addItem(new ItemStack(MinecraftItemTypes.ladder, laddersDestroyed));
+        // player.runCommand(`give @s ladder ${laddersDestroyed}`);
     }
     else if (player.isSneaking) {
         const { x, y, z } = blockDestroyed.location;
@@ -37,7 +39,7 @@ world.afterEvents.blockBreak.subscribe(async (event) => {
             laddersDestroyed = dimension.fillBlocks(blockDestroyed.location, lastLadderBlock.location, MinecraftBlockTypes.air, { matchingBlock: blockPermutation });
             resolve();
         });
-        player.runCommand(`give @s ladder ${laddersDestroyed}`);
+        inventory.addItem(new ItemStack(MinecraftItemTypes.ladder, laddersDestroyed));
     }
 });
 world.beforeEvents.itemUseOn.subscribe((event) => {
