@@ -1,5 +1,5 @@
-import { Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, ItemStack, MinecraftBlockTypes, MinecraftItemTypes, system, world } from "@minecraft/server";
-import { getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadderPart, setCardinalBlock, setLadderSupport } from "./packages";
+import { Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, MinecraftBlockTypes, MinecraftItemTypes, system, world } from "@minecraft/server";
+import { CContainer, Logger, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadderPart, setCardinalBlock, setLadderSupport } from "./packages";
 const logMap = new Map();
 /**
  * Features:
@@ -8,6 +8,7 @@ const logMap = new Map();
  *
  * ? ToDO:
  * * Ladder Support is destroyable like ladder. When you destroy it, it destroys the ladder also.
+ * * Don't place ladder if there's a block between Other 3 cardinal direction.
  *
  */
 world.afterEvents.blockBreak.subscribe(async (event) => {
@@ -20,42 +21,39 @@ world.afterEvents.blockBreak.subscribe(async (event) => {
         return;
     if (heldItem?.typeId !== MinecraftBlockTypes.ladder.id)
         return;
+    const inventory = new CContainer(player.getComponent(EntityInventoryComponent.componentId).container).setPlayer(player);
     let laddersDestroyed = 0;
-    const inventory = player.getComponent(EntityInventoryComponent.componentId).container;
     if (!player.isSneaking) {
         const { x, y, z } = blockDestroyed.location;
-        const lastLadderBlock = getBlockFromRayFiltered(dimension.getBlock({ x, y: y + 1, z }), { x: 0, y: 1, z: 0 }, { filteredBlocks: MinecraftBlockTypes.ladder });
-        await new Promise((resolve) => {
-            laddersDestroyed = dimension.fillBlocks(blockDestroyed.location, lastLadderBlock.location, MinecraftBlockTypes.air, { matchingBlock: blockPermutation });
-            resolve();
-        });
-        inventory.addItem(new ItemStack(MinecraftItemTypes.ladder, laddersDestroyed));
-        // player.runCommand(`give @s ladder ${laddersDestroyed}`);
+        const startBlock = dimension.getBlock({ x, y: y + 1, z });
+        if (startBlock.isAir())
+            return;
+        const lastLadderBlock = getBlockFromRayFiltered(startBlock, { x: 0, y: 1, z: 0 }, { filteredBlocks: MinecraftBlockTypes.ladder });
+        await new Promise((resolve) => { laddersDestroyed = dimension.fillBlocks(blockDestroyed.location, lastLadderBlock.location, MinecraftBlockTypes.air, { matchingBlock: blockPermutation }); resolve(); });
+        inventory.addItem(MinecraftItemTypes.ladder, laddersDestroyed);
     }
     else if (player.isSneaking) {
         const { x, y, z } = blockDestroyed.location;
-        const lastLadderBlock = getBlockFromRayFiltered(dimension.getBlock({ x, y: y - 1, z }), { x: 0, y: -1, z: 0 }, { filteredBlocks: MinecraftBlockTypes.ladder });
-        await new Promise((resolve) => {
-            laddersDestroyed = dimension.fillBlocks(blockDestroyed.location, lastLadderBlock.location, MinecraftBlockTypes.air, { matchingBlock: blockPermutation });
-            resolve();
-        });
-        inventory.addItem(new ItemStack(MinecraftItemTypes.ladder, laddersDestroyed));
+        const startBlock = dimension.getBlock({ x, y: y - 1, z });
+        if (startBlock.isAir())
+            return;
+        const lastLadderBlock = getBlockFromRayFiltered(startBlock, { x: 0, y: -1, z: 0 }, { filteredBlocks: MinecraftBlockTypes.ladder });
+        await new Promise((resolve) => { laddersDestroyed = dimension.fillBlocks(blockDestroyed.location, lastLadderBlock.location, MinecraftBlockTypes.air, { matchingBlock: blockPermutation }); resolve(); });
+        inventory.addItem(MinecraftItemTypes.ladder, laddersDestroyed);
     }
 });
 world.beforeEvents.itemUseOn.subscribe((event) => {
-    const itemUsed = event.itemStack;
+    let { block: _blockPlaced, itemStack: itemUsed, blockFace: blockInteractedFace } = event;
     const player = event.source;
-    let _blockPlaced = event.block;
-    const blockInteractedFace = event.blockFace;
     if (itemUsed.typeId !== "minecraft:ladder")
         return;
     const oldLog = logMap.get(player.name);
     logMap.set(player.name, Date.now());
     if ((oldLog + 150) >= Date.now())
         return;
-    const { y: yRot } = player.getRotation();
-    const playerCardinalFacing = getCardinalFacing(yRot);
+    const playerCardinalFacing = getCardinalFacing(player.getRotation().y);
     const { x, y, z } = _blockPlaced.location;
+    const inventory = new CContainer(player.getComponent(EntityInventoryComponent.componentId).container);
     system.run(async () => {
         if (Direction.up === blockInteractedFace) {
             if (isLadderPart(_blockPlaced))
@@ -66,12 +64,9 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
                 return;
             if (_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId))
                 return;
-            player.runCommand(`clear @s ladder -1 1`);
+            inventory.clearItem(MinecraftItemTypes.ladder.id, 1);
             setLadderSupport(_blockPlaced, playerCardinalFacing);
-            await new Promise((resolve) => {
-                setCardinalBlock(_blockPlaced, playerCardinalFacing, MinecraftBlockTypes.ladder);
-                resolve();
-            });
+            await new Promise((resolve) => { setCardinalBlock(_blockPlaced, playerCardinalFacing, MinecraftBlockTypes.ladder); resolve(); });
             return;
         }
         else if (Direction.down === blockInteractedFace) {
@@ -83,12 +78,9 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
                 return;
             if (_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId))
                 return;
-            player.runCommand(`clear @s ladder -1 1`);
+            inventory.clearItem(MinecraftItemTypes.ladder.id, 1);
             setLadderSupport(_blockPlaced, playerCardinalFacing);
-            await new Promise((resolve) => {
-                setCardinalBlock(_blockPlaced, playerCardinalFacing, MinecraftBlockTypes.ladder);
-                resolve();
-            });
+            await new Promise((resolve) => { setCardinalBlock(_blockPlaced, playerCardinalFacing, MinecraftBlockTypes.ladder); resolve(); });
             return;
         }
         else {
@@ -103,12 +95,9 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
                     return;
                 if (availableBlock.isSolid() || isInExcludedBlocks(availableBlock.typeId))
                     return;
-                player.runCommand(`clear @s ladder -1 1`);
+                inventory.clearItem(MinecraftItemTypes.ladder.id, 1);
                 setLadderSupport(availableBlock, blockFace);
-                await new Promise((resolve) => {
-                    setCardinalBlock(availableBlock, blockFace, MinecraftBlockTypes.ladder);
-                    resolve();
-                });
+                await new Promise((resolve) => { setCardinalBlock(availableBlock, blockFace, MinecraftBlockTypes.ladder); resolve(); });
             }
             else if (player.isSneaking) {
                 const availableBlock = getBlockFromRayFiltered(_blockPlaced, { x: 0, y: -1, z: 0 }, { filteredBlocks: MinecraftBlockTypes.ladder });
@@ -116,13 +105,50 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
                     return;
                 if (availableBlock.isSolid() || isInExcludedBlocks(availableBlock.typeId))
                     return;
-                player.runCommand(`clear @s ladder -1 1`);
+                inventory.clearItem(MinecraftItemTypes.ladder.id, 1);
                 setLadderSupport(availableBlock, blockFace);
-                await new Promise((resolve) => {
-                    setCardinalBlock(availableBlock, blockFace, MinecraftBlockTypes.ladder);
-                    resolve();
-                });
+                await new Promise((resolve) => { setCardinalBlock(availableBlock, blockFace, MinecraftBlockTypes.ladder); resolve(); });
             }
         }
+    });
+});
+world.beforeEvents.chatSend.subscribe((event) => {
+    const prefix = "-";
+    let player = event.sender;
+    let message = event.message;
+    const args = message.trim().slice(prefix.length).split(/\s+/g);
+    const command = args[0];
+    if (command !== "fill")
+        return;
+    const amountToFill = parseInt(args[1].replace(/[^0-9.-]/g, ''), 10);
+    if (isNaN(amountToFill)) {
+        Logger.warn('Invalid amount to fill.');
+        return;
+    }
+    let blocksFilled = 0;
+    let blockFacing = player.getBlockFromViewDirection({ maxDistance: 10 });
+    const { y: yRot } = player.getRotation();
+    const playerCardinalFacing = getCardinalFacing(yRot);
+    const { x, y, z } = blockFacing.location;
+    const initialOffset = blockFacing.isSolid() && !isInExcludedBlocks(blockFacing.typeId) ? 1 : 0;
+    blockFacing = blockFacing.dimension.getBlock({ x, y: y + initialOffset, z });
+    if (isLadderPart(blockFacing) || blockFacing.isSolid() || isInExcludedBlocks(blockFacing.typeId))
+        return;
+    system.run(async () => {
+        setLadderSupport(blockFacing, playerCardinalFacing);
+        setCardinalBlock(blockFacing, playerCardinalFacing, MinecraftBlockTypes.ladder);
+        await new Promise((resolve) => {
+            for (let i = blocksFilled; i < amountToFill; i++) {
+                const availableBlock = getBlockFromRayFiltered(blockFacing, { x: 0, y: 1, z: 0 }, { filteredBlocks: MinecraftBlockTypes.ladder });
+                if (!availableBlock || availableBlock.isSolid() || isInExcludedBlocks(availableBlock.typeId))
+                    return;
+                setLadderSupport(availableBlock, playerCardinalFacing);
+                setCardinalBlock(availableBlock, playerCardinalFacing, MinecraftBlockTypes.ladder);
+                blockFacing = blockFacing.dimension.getBlock({ x, y: blockFacing.y + 1, z });
+                blocksFilled++;
+            }
+            Logger.warn(`Filled ${blocksFilled} blocks.`);
+            resolve();
+        });
     });
 });

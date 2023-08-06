@@ -1,5 +1,5 @@
 import { Block, BlockPermutation, BlockType, MinecraftBlockTypes, Vector, Vector3 } from "@minecraft/server";
-import { disableLadderGriefing, griefableBlocks, nonGriefableBlocks } from "../packages";
+import { Compare, disableLadderGriefing, griefableBlocks, nonGriefableBlocks } from "../packages";
 
 const LadderSupportDirection: Map<number, Vector3> = new Map([
     [2, {x: 0, y: 0, z: 1}],
@@ -20,13 +20,14 @@ type RayFilterOptions = {
  * @param RayFilterOptions {RayFilterOptions}
  * @returns {Block | null}
  */
-function getBlockFromRayFiltered(block: Block, directionVector: Vector3, RayFilterOptions: RayFilterOptions = {maxDistance: 385}): Block | null {
+function getBlockFromRayFiltered(block: Block, directionVector: Vector3, RayFilterOptions: RayFilterOptions = {maxDistance: 150}): Block | null {
     let {x, y, z} = block.location;
     const {x: directionX, y: directionY, z: directionZ} = directionVector;
     let blockCheck = 0;
     let newBlock = block.dimension.getBlock({x: x + directionX, y: y + directionY, z: z + directionZ});
     while (true) {
-        if(blockCheck > RayFilterOptions.maxDistance) return block;
+        if(blockCheck > RayFilterOptions.maxDistance) return newBlock;
+        if(isOutofBuildLimit(newBlock.location.y)) return newBlock;
         if(newBlock.type !== RayFilterOptions.filteredBlocks) break;
         newBlock = block.dimension.getBlock({x, y: y + blockCheck, z});
         blockCheck += directionVector.y;
@@ -74,8 +75,12 @@ function isInExcludedBlocks(blockID: string): boolean {
 }
 
 function setCardinalBlock(block: Block, face: number, blockReplace: BlockType): void {
+    if(isOutofBuildLimit(block.location.y)) {
+        throw new Error("Stackable Ladder: Cannot place block out of build limit.");
+    }
     const facing_direction_selector = (blockReplace === MinecraftBlockTypes.ladder) ? "facing_direction" : "yn:facing_direction";
     block.setType(blockReplace);
+    if(Compare.types.isEqual(block.type, MinecraftBlockTypes.air)) return;
     const perm: BlockPermutation = BlockPermutation.resolve(block.typeId).withState(facing_direction_selector, face);
     block.setPermutation(perm);
 }
@@ -89,6 +94,25 @@ function setLadderSupport(block: Block, face: number): void {
     }
 }
 
+async function removeCardinalBlockMismatch(block: Block, facingDirection: number): Promise<void> {
+    // Not used, but used for clearing up the cardinal block mismatch. (e.g. ladder placed on the side of the wall, then it automatically placed ladder 
+    // in other cardinal directions also. Making use of your ladder into such waste.)
+    let successPlaced = 0;
+    const {x, y, z} = block.location;
+    for (const [faceKey, cardinalPosition] of LadderSupportDirection) {
+        const {x: x2, y: y2, z: z2} = cardinalPosition;
+        if (Compare.types.isEqual(faceKey, facingDirection)) continue;
+        const _block: Block = block.dimension.getBlock({x: x + x2, y: y + y2, z: z + z2});
+        if(Compare.types.isEqual(_block.type, block.type)) {
+            _block.setType(MinecraftBlockTypes.air);
+            successPlaced++;
+        }
+    }
+}
+
+
 const isLadderPart = (blockPlaced: Block) => (blockPlaced.type === MinecraftBlockTypes.ladder || blockPlaced.type === MinecraftBlockTypes.get("yn:fake_wall_block"));
 
-export {getBlockFromRayFiltered, isInExcludedBlocks, LadderSupportDirection, setCardinalBlock, setLadderSupport, isLadderPart};
+const isOutofBuildLimit = (y: number): boolean => (y >= 319 || y <= -64);
+
+export {getBlockFromRayFiltered, isInExcludedBlocks, LadderSupportDirection, setCardinalBlock, setLadderSupport, isLadderPart, isOutofBuildLimit};
