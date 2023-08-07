@@ -60,6 +60,7 @@ function isInExcludedBlocks(blockID) {
         'minecraft:bell',
         'minecraft:chain',
         '.*azalea',
+        'minecraft:ladder',
         'yn:fake_wall_block',
         'minecraft:bed',
     ];
@@ -104,7 +105,7 @@ async function removeCardinalBlockMismatch(block, facingDirection) {
     }
     return successPlaced;
 }
-const isLadderPart = (blockPlaced) => (blockPlaced === MinecraftBlockTypes.ladder || blockPlaced === MinecraftBlockTypes.get("yn:fake_wall_block"));
-const isLadder = (blockPlaced) => (blockPlaced === MinecraftBlockTypes.ladder);
+const isLadder = (blockPlaced) => Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.ladder);
+const isLadderPart = (blockPlaced) => (Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.ladder) || Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.get("yn:fake_wall_block")));
 const isOutofBuildLimit = (y) => (y >= 319 || y <= -64);
 export { getBlockFromRayFiltered, isInExcludedBlocks, LadderSupportDirection, setCardinalBlock, setLadderSupport, isLadderPart, isLadder, isOutofBuildLimit, removeCardinalBlockMismatch };

@@ -1,4 +1,4 @@
-import { Block, BlockPermutation, BlockType, MinecraftBlockTypes, Vector, Vector3 } from "@minecraft/server";
+import { Block, BlockPermutation, BlockType, Direction, MinecraftBlockTypes, Vector, Vector3 } from "@minecraft/server";
 import { Compare, Logger, disableLadderGriefing, griefableBlocks, nonGriefableBlocks } from "../packages";
 
 const LadderSupportDirection: Map<number, Vector3> = new Map([
@@ -64,6 +64,7 @@ function isInExcludedBlocks(blockID: string): boolean {
     'minecraft:bell',
     'minecraft:chain',
     '.*azalea',
+    'minecraft:ladder',
     'yn:fake_wall_block',
     'minecraft:bed',
   ];
@@ -93,6 +94,21 @@ function setLadderSupport(block: Block, face: number): void {
         setCardinalBlock(supportBlock, face, MinecraftBlockTypes.get("yn:fake_wall_block"));
     }
 }
+function resolveBlockFaceDirection(blockInteractedFace: Direction, _blockPlaced: Block, playerCardinalFacing: number): number | undefined {
+    // Gets the default blockFace to handle up, down, and sides detection to place the ladder depending on what block face the player is looking at
+    // or depending on the player's intereacted block, if it is a ladder, then just get that ladder's facing direction.
+    const directionMap = {
+            [Direction.up]: playerCardinalFacing,
+            [Direction.down]: playerCardinalFacing,
+            [Direction.east]: undefined,
+            [Direction.west]: undefined,
+            [Direction.north]: undefined,
+            [Direction.south]: undefined
+    };
+    for (const [direction, defaultValue] of Object.entries(directionMap)) {
+            if (blockInteractedFace === direction) return (_blockPlaced.permutation.getState("facing_direction")?.valueOf() as number) ?? defaultValue;
+    }
+}
 
 async function removeCardinalBlockMismatch(block: Block, facingDirection: number): Promise<number> {
     // Not used, but used for clearing up the cardinal block mismatch. (e.g. ladder placed on the side of the wall, then it automatically placed ladder 
@@ -117,4 +133,15 @@ const isLadderPart = (blockPlaced: BlockType) => (Compare.types.isEqual(blockPla
 
 const isOutofBuildLimit = (y: number): boolean => (y >= 319 || y <= -64);
 
-export {getBlockFromRayFiltered, isInExcludedBlocks, LadderSupportDirection, setCardinalBlock, setLadderSupport, isLadderPart, isLadder, isOutofBuildLimit, removeCardinalBlockMismatch};
+export {
+    getBlockFromRayFiltered, 
+    isInExcludedBlocks, 
+    LadderSupportDirection, 
+    setCardinalBlock, 
+    setLadderSupport, 
+    isLadderPart, 
+    isLadder, 
+    isOutofBuildLimit, 
+    removeCardinalBlockMismatch, 
+    resolveBlockFaceDirection
+};
