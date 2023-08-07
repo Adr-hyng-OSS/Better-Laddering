@@ -1,5 +1,5 @@
 import { BlockPermutation, Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, MinecraftBlockTypes, MinecraftItemTypes, system, world } from "@minecraft/server";
-import { CContainer, Compare, LadderSupportDirection, Logger, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadder, isLadderPart, setCardinalBlock, setLadderSupport } from "./packages";
+import { CContainer, Compare, LadderSupportDirection, Logger, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadder, isLadderPart, resolveBlockFaceDirection, setCardinalBlock, setLadderSupport } from "./packages";
 const logMap = new Map();
 /**
  * Features:
@@ -75,23 +75,8 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
     const playerCardinalFacing = getCardinalFacing(player.getRotation().y);
     const { x, y, z } = _blockPlaced.location;
     const inventory = new CContainer(player.getComponent(EntityInventoryComponent.componentId).container);
-    let blockFace = undefined;
     system.run(async () => {
-        const resolveBlockFaceDirection = (blockInteractedFace, _blockPlaced, playerCardinalFacing) => {
-            const directionMap = {
-                [Direction.up]: playerCardinalFacing,
-                [Direction.down]: playerCardinalFacing,
-                [Direction.east]: undefined,
-                [Direction.west]: undefined,
-                [Direction.north]: undefined,
-                [Direction.south]: undefined
-            };
-            for (const [direction, defaultValue] of Object.entries(directionMap)) {
-                if (blockInteractedFace === direction)
-                    return _blockPlaced.permutation.getState("facing_direction")?.valueOf() ?? defaultValue;
-            }
-        };
-        blockFace = resolveBlockFaceDirection(blockInteractedFace, _blockPlaced, playerCardinalFacing);
+        const blockFace = resolveBlockFaceDirection(blockInteractedFace, _blockPlaced, playerCardinalFacing);
         if (Direction.up === blockInteractedFace) {
             const initialOffset = (_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId)) ? 1 : 0;
             _blockPlaced = _blockPlaced.dimension.getBlock({ x, y: y + initialOffset, z });

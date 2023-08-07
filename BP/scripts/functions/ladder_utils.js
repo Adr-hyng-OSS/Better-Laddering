@@ -1,4 +1,4 @@
-import { BlockPermutation, MinecraftBlockTypes, Vector } from "@minecraft/server";
+import { BlockPermutation, Direction, MinecraftBlockTypes, Vector } from "@minecraft/server";
 import { Compare, disableLadderGriefing, griefableBlocks, nonGriefableBlocks } from "../packages";
 const LadderSupportDirection = new Map([
     [2, { x: 0, y: 0, z: 1 }],
@@ -88,6 +88,22 @@ function setLadderSupport(block, face) {
         setCardinalBlock(supportBlock, face, MinecraftBlockTypes.get("yn:fake_wall_block"));
     }
 }
+function resolveBlockFaceDirection(blockInteractedFace, _blockPlaced, playerCardinalFacing) {
+    // Gets the default blockFace to handle up, down, and sides detection to place the ladder depending on what block face the player is looking at
+    // or depending on the player's intereacted block, if it is a ladder, then just get that ladder's facing direction.
+    const directionMap = {
+        [Direction.up]: playerCardinalFacing,
+        [Direction.down]: playerCardinalFacing,
+        [Direction.east]: undefined,
+        [Direction.west]: undefined,
+        [Direction.north]: undefined,
+        [Direction.south]: undefined
+    };
+    for (const [direction, defaultValue] of Object.entries(directionMap)) {
+        if (blockInteractedFace === direction)
+            return _blockPlaced.permutation.getState("facing_direction")?.valueOf() ?? defaultValue;
+    }
+}
 async function removeCardinalBlockMismatch(block, facingDirection) {
     // Not used, but used for clearing up the cardinal block mismatch. (e.g. ladder placed on the side of the wall, then it automatically placed ladder 
     // in other cardinal directions also. Making use of your ladder into such waste.)
@@ -108,4 +124,4 @@ async function removeCardinalBlockMismatch(block, facingDirection) {
 const isLadder = (blockPlaced) => Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.ladder);
 const isLadderPart = (blockPlaced) => (Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.ladder) || Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.get("yn:fake_wall_block")));
 const isOutofBuildLimit = (y) => (y >= 319 || y <= -64);
-export { getBlockFromRayFiltered, isInExcludedBlocks, LadderSupportDirection, setCardinalBlock, setLadderSupport, isLadderPart, isLadder, isOutofBuildLimit, removeCardinalBlockMismatch };
+export { getBlockFromRayFiltered, isInExcludedBlocks, LadderSupportDirection, setCardinalBlock, setLadderSupport, isLadderPart, isLadder, isOutofBuildLimit, removeCardinalBlockMismatch, resolveBlockFaceDirection };

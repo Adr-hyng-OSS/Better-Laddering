@@ -4,6 +4,9 @@
    "resource_pack_name" : "vanilla",
    "texture_data" : {
       "empty" : {
+         "textures" : "textures/blocks/empty"
+      },
+      "debug" : {
          "textures" : "textures/blocks/oak_wood"
       },
       "acacia_planks" : {
