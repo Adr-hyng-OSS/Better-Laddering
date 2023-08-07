@@ -1,5 +1,5 @@
-import { Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, MinecraftBlockTypes, MinecraftItemTypes, system, world } from "@minecraft/server";
-import { CContainer, Logger, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadderPart, setCardinalBlock, setLadderSupport } from "./packages";
+import { BlockPermutation, Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, MinecraftBlockTypes, MinecraftItemTypes, system, world } from "@minecraft/server";
+import { CContainer, Compare, LadderSupportDirection, Logger, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadderPart, setCardinalBlock, setLadderSupport } from "./packages";
 const logMap = new Map();
 /**
  * Features:
@@ -7,7 +7,6 @@ const logMap = new Map();
  * * To break all ladders above or below, hold ladder, and destroy a ladder.
  *
  * ? ToDO:
- * * Ladder Support is destroyable like ladder. When you destroy it, it destroys the ladder also.
  * * Don't place ladder if there's a block between Other 3 cardinal direction.
  *
  */
@@ -17,28 +16,50 @@ world.afterEvents.blockBreak.subscribe(async (event) => {
     const player = event.player;
     const heldItem = player.getComponent(EntityEquipmentInventoryComponent.componentId).getEquipment(EquipmentSlot.mainhand);
     const dimension = event.dimension;
-    if (blockPermutation.type.id !== MinecraftBlockTypes.ladder.id)
+    if (!isLadderPart(blockPermutation.type))
         return;
     if (heldItem?.typeId !== MinecraftBlockTypes.ladder.id)
         return;
     const inventory = new CContainer(player.getComponent(EntityInventoryComponent.componentId).container).setPlayer(player);
     let laddersDestroyed = 0;
+    const blockFace = blockPermutation.getState(Compare.types.isEqual(blockPermutation.type, MinecraftBlockTypes.ladder) ? "facing_direction" : "yn:facing_direction")?.valueOf() ?? undefined;
+    if (blockFace === undefined)
+        return;
+    const { x, y, z } = blockDestroyed.location;
+    const isLadder = Compare.types.isEqual(blockPermutation.type, MinecraftBlockTypes.ladder);
+    const { x: faceX, z: faceZ } = LadderSupportDirection.get(blockFace);
+    const CONDITIONAL_BACK_VECTOR = {
+        x: x + (-faceX || 0),
+        y: y,
+        z: z + (-faceZ || 0),
+    };
+    const finalOffset = {
+        x: isLadder ? x : CONDITIONAL_BACK_VECTOR.x,
+        y: y,
+        z: isLadder ? z : CONDITIONAL_BACK_VECTOR.z,
+    };
     if (!player.isSneaking) {
-        const { x, y, z } = blockDestroyed.location;
-        const startBlock = dimension.getBlock({ x, y: y + 1, z });
+        const startBlock = dimension.getBlock({ x: finalOffset.x, y: y + 1, z: finalOffset.z });
         if (startBlock.isAir())
             return;
         const lastLadderBlock = getBlockFromRayFiltered(startBlock, { x: 0, y: 1, z: 0 }, { filteredBlocks: MinecraftBlockTypes.ladder });
-        await new Promise((resolve) => { laddersDestroyed = dimension.fillBlocks(blockDestroyed.location, lastLadderBlock.location, MinecraftBlockTypes.air, { matchingBlock: blockPermutation }); resolve(); });
+        await new Promise((resolve) => {
+            const expectedLadderPermutation = BlockPermutation.resolve(MinecraftBlockTypes.ladder.id).withState("facing_direction", blockFace);
+            laddersDestroyed = dimension.fillBlocks(finalOffset, lastLadderBlock.location, MinecraftBlockTypes.air, { matchingBlock: expectedLadderPermutation });
+            resolve();
+        });
         inventory.addItem(MinecraftItemTypes.ladder, laddersDestroyed);
     }
     else if (player.isSneaking) {
-        const { x, y, z } = blockDestroyed.location;
-        const startBlock = dimension.getBlock({ x, y: y - 1, z });
+        const startBlock = dimension.getBlock({ x: finalOffset.x, y: y - 1, z: finalOffset.z });
         if (startBlock.isAir())
             return;
         const lastLadderBlock = getBlockFromRayFiltered(startBlock, { x: 0, y: -1, z: 0 }, { filteredBlocks: MinecraftBlockTypes.ladder });
-        await new Promise((resolve) => { laddersDestroyed = dimension.fillBlocks(blockDestroyed.location, lastLadderBlock.location, MinecraftBlockTypes.air, { matchingBlock: blockPermutation }); resolve(); });
+        await new Promise((resolve) => {
+            const expectedLadderPermutation = BlockPermutation.resolve(MinecraftBlockTypes.ladder.id).withState("facing_direction", blockFace);
+            laddersDestroyed = dimension.fillBlocks(finalOffset, lastLadderBlock.location, MinecraftBlockTypes.air, { matchingBlock: expectedLadderPermutation });
+            resolve();
+        });
         inventory.addItem(MinecraftItemTypes.ladder, laddersDestroyed);
     }
 });
@@ -56,11 +77,11 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
     const inventory = new CContainer(player.getComponent(EntityInventoryComponent.componentId).container);
     system.run(async () => {
         if (Direction.up === blockInteractedFace) {
-            if (isLadderPart(_blockPlaced))
+            if (isLadderPart(_blockPlaced.type))
                 return;
             const initialOffset = _blockPlaced.isSolid() && !isInExcludedBlocks(_blockPlaced.typeId) ? 1 : 0;
             _blockPlaced = _blockPlaced.dimension.getBlock({ x, y: y + initialOffset, z });
-            if (isLadderPart(_blockPlaced))
+            if (isLadderPart(_blockPlaced.type))
                 return;
             if (_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId))
                 return;
@@ -70,11 +91,11 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
             return;
         }
         else if (Direction.down === blockInteractedFace) {
-            if (isLadderPart(_blockPlaced))
+            if (isLadderPart(_blockPlaced.type))
                 return;
-            const initialOffset = _blockPlaced.isSolid() && !isInExcludedBlocks(_blockPlaced.typeId) ? 1 : 0;
+            const initialOffset = (_blockPlaced.isSolid() && !isInExcludedBlocks(_blockPlaced.typeId)) ? 1 : 0;
             _blockPlaced = _blockPlaced.dimension.getBlock({ x, y: y - initialOffset, z });
-            if (isLadderPart(_blockPlaced))
+            if (isLadderPart(_blockPlaced.type))
                 return;
             if (_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId))
                 return;
@@ -132,7 +153,7 @@ world.beforeEvents.chatSend.subscribe((event) => {
     const { x, y, z } = blockFacing.location;
     const initialOffset = blockFacing.isSolid() && !isInExcludedBlocks(blockFacing.typeId) ? 1 : 0;
     blockFacing = blockFacing.dimension.getBlock({ x, y: y + initialOffset, z });
-    if (isLadderPart(blockFacing) || blockFacing.isSolid() || isInExcludedBlocks(blockFacing.typeId))
+    if (isLadderPart(blockFacing.type) || blockFacing.isSolid() || isInExcludedBlocks(blockFacing.typeId))
         return;
     system.run(async () => {
         setLadderSupport(blockFacing, playerCardinalFacing);
