@@ -102,7 +102,8 @@ async function removeCardinalBlockMismatch(block, facingDirection) {
             successPlaced++;
         }
     }
+    return successPlaced;
 }
 const isLadderPart = (blockPlaced) => (blockPlaced.type === MinecraftBlockTypes.ladder || blockPlaced.type === MinecraftBlockTypes.get("yn:fake_wall_block"));
 const isOutofBuildLimit = (y) => (y >= 319 || y <= -64);
-export { getBlockFromRayFiltered, isInExcludedBlocks, LadderSupportDirection, setCardinalBlock, setLadderSupport, isLadderPart, isOutofBuildLimit };
+export { getBlockFromRayFiltered, isInExcludedBlocks, LadderSupportDirection, setCardinalBlock, setLadderSupport, isLadderPart, isOutofBuildLimit, removeCardinalBlockMismatch };

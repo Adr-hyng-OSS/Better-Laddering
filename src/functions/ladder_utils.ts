@@ -1,5 +1,5 @@
 import { Block, BlockPermutation, BlockType, MinecraftBlockTypes, Vector, Vector3 } from "@minecraft/server";
-import { Compare, disableLadderGriefing, griefableBlocks, nonGriefableBlocks } from "../packages";
+import { Compare, Logger, disableLadderGriefing, griefableBlocks, nonGriefableBlocks } from "../packages";
 
 const LadderSupportDirection: Map<number, Vector3> = new Map([
     [2, {x: 0, y: 0, z: 1}],
@@ -94,7 +94,7 @@ function setLadderSupport(block: Block, face: number): void {
     }
 }
 
-async function removeCardinalBlockMismatch(block: Block, facingDirection: number): Promise<void> {
+async function removeCardinalBlockMismatch(block: Block, facingDirection: number): Promise<number> {
     // Not used, but used for clearing up the cardinal block mismatch. (e.g. ladder placed on the side of the wall, then it automatically placed ladder 
     // in other cardinal directions also. Making use of your ladder into such waste.)
     let successPlaced = 0;
@@ -108,6 +108,7 @@ async function removeCardinalBlockMismatch(block: Block, facingDirection: number
             successPlaced++;
         }
     }
+    return successPlaced;
 }
 
 
@@ -115,4 +116,4 @@ const isLadderPart = (blockPlaced: Block) => (blockPlaced.type === MinecraftBloc
 
 const isOutofBuildLimit = (y: number): boolean => (y >= 319 || y <= -64);
 
-export {getBlockFromRayFiltered, isInExcludedBlocks, LadderSupportDirection, setCardinalBlock, setLadderSupport, isLadderPart, isOutofBuildLimit};
+export {getBlockFromRayFiltered, isInExcludedBlocks, LadderSupportDirection, setCardinalBlock, setLadderSupport, isLadderPart, isOutofBuildLimit, removeCardinalBlockMismatch};

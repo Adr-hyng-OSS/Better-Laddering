@@ -56,6 +56,8 @@ class CContainer {
         // Author: Adr-hyng <https://github.com/Adr-hyng>
         // Project: https://github.com/Adr-hyng-OSS/Lumber-Axe
         // Behaves similar to "Give" command.
+        if (!amount)
+            return;
         const item = new ItemStack(itemTypeToAdd);
         let exceededAmount = 0;
         if (amount > item.maxAmount) {
