@@ -1,10 +1,5 @@
 <h1 align="center"> <strong> Better Laddering: Bedrock Edition </strong> </h1>
 
-<!-- img.shield's live badge not working consistently. -->
-<!-- ![status](https://img.shields.io/endpoint?url=https%3A%2F%2Fdynamic-badge-formatter-ynrxn78r2oye.runkit.sh%2Fjson%3Furl%3Dhttps%253A%252F%252Flumber-axe-development-status-35us2vizz6yl.runkit.sh%252F%26query%3DDevelopment%26formatter%3Dmetric%26label%3DDevelopment%26labelColor%3Dgrey%26color%3Dblue%26logo%3Dvisualstudiocode%26logoColor%3Dblue%26logoWidth%3D16%26style%3Dflat) -->
-
-<!-- ![version](https://img.shields.io/endpoint?url=https%3A%2F%2Fdynamic-badge-formatter-ynrxn78r2oye.runkit.sh%2Fjson%3Furl%3Dhttps%253A%252F%252Flumber-axe-development-status-35us2vizz6yl.runkit.sh%252F%26query%3DVersion%26formatter%3Dmetric%26label%3DVersion%26labelColor%3Dgrey%26color%3Dblue%26logo%3Dgit%26logoColor%3Dred%26logoWidth%3D16%26style%3Dflat) -->
-
 <div align="center">
 
   ![DevelopmentStatus](https://img.shields.io/badge/Development-finished-2ea44f?logo=visualstudiocode&logoColor=blue)
@@ -26,7 +21,7 @@
 <h5 align="center"> This concept was inspired by the Java mod <a href="https://modrinth.com/mod/better-ladders">Better Ladders</a> by meeetj </h5>
 <br>
 
-<h1 align="center" >🎮 <a href="https://www.youtube.com/watch?v=m95KutIwvp8"><strong>Showcase</strong> </a> 🎮</h1>
+<h1 align="center" >🎮 <a href="https://youtube.com/playlist?list=PLHMbEPQsIZ9zJ6dVAVO0E1YM5qgYO1iQI"><strong>Showcase</strong> </a> 🎮</h1>
 
 ## 🕹️ *In-Game:*
 
