@@ -14,7 +14,7 @@
 
 -----
 
-<p align="center"><img src="https://github.com/Adr-hyng/Better-Laddering/assets/95139246/ec54a1e8-868d-40ea-a2c5-0f7fa08d878d" alt="UPLOAD HD AS LOGO (WIP)"></p>
+<p align="center"><img src="https://github.com/Adr-hyng/Better-Laddering/assets/95139246/32fe1e8c-e9dc-40e8-b2ae-68f2c22540fc" alt="UPLOAD HD AS LOGO (WIP)"></p>
 
 🪜 Enhance Minecraft Bedrock with "Better Laddering" addon! Place ladders without support, stack ladders above or below with ease, and make ladders useful than before. Make your cave, and mountain exploration easier!
 
@@ -27,7 +27,7 @@
 
 Make sure you **TURN ON** the following features or capabilities in the game:
 
-![image](https://github.com/Adr-hyng/Better-Laddering/assets/95139246/b531788e-93d2-4bd7-9139-b5a7c83fe29e)
+![image](https://github.com/Adr-hyng/Better-Laddering/assets/95139246/3877675b-4d30-4286-93c0-1573dc746a23)
 
 
 To fully activate the addon. Make sure to activate the Behavior Pack and Resource Pack to your selected world.
