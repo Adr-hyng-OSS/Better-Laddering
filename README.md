@@ -6,7 +6,7 @@
   ![Version](https://img.shields.io/badge/Version-v1.0.0-2ea44f?logo=git&logoColor=red)
   [![TwitterLink](https://img.shields.io/badge/Twitter-Follow_@h__YanG__0A-2ea44f?logo=twitter&logoColor=blue)](https://twitter.com/h_YanG_0A)
   [![PaypalLink](https://img.shields.io/badge/Support-Donate-2ea44f?logo=paypal)](https://www.paypal.com/paypalme/DennisAbaigar?country.x=PH&locale.x=en_US)
-  ![Minecraft BE Addon Latest Release](https://img.shields.io/github/v/release/Adr-hyng-OSS/Lumber-Axe?logo=xbox&logoColor=green&label=Minecraft)
+  ![Minecraft BE Addon Latest Release](https://img.shields.io/github/v/release/Adr-hyng-OSS/Better-Laddering?logo=xbox&logoColor=green&label=Minecraft)
   <!-- [![Release Downloads](https://img.shields.io/badge/dynamic/json?label=Downloads&query=%24%5B0%5D.assets%5B0%5D.download_count&url=https%3A%2F%2Fapi.github.com%2Frepos%2FAdr-hyng-OSS%2FLumber-Axe%2Freleases)](https://github.com/Adr-hyng-OSS/Lumber-Axe/releases/latest) -->
   
 </div>
@@ -14,7 +14,7 @@
 
 -----
 
-<p align="center"><img src="https://github.com/Adr-hyng/Better-Laddering/assets/95139246/ec54a1e8-868d-40ea-a2c5-0f7fa08d878d" alt="UPLOAD HD AS LOGO (WIP)"></p>
+<p align="center"><img src="https://github.com/Adr-hyng/Better-Laddering/assets/95139246/32fe1e8c-e9dc-40e8-b2ae-68f2c22540fc" alt="UPLOAD HD AS LOGO (WIP)"></p>
 
 🪜 Enhance Minecraft Bedrock with "Better Laddering" addon! Place ladders without support, stack ladders above or below with ease, and make ladders useful than before. Make your cave, and mountain exploration easier!
 
@@ -27,7 +27,7 @@
 
 Make sure you **TURN ON** the following features or capabilities in the game:
 
-![image](https://github.com/Adr-hyng/Better-Laddering/assets/95139246/b531788e-93d2-4bd7-9139-b5a7c83fe29e)
+![image](https://github.com/Adr-hyng/Better-Laddering/assets/95139246/3877675b-4d30-4286-93c0-1573dc746a23)
 
 
 To fully activate the addon. Make sure to activate the Behavior Pack and Resource Pack to your selected world.
@@ -58,13 +58,13 @@ To fully activate the addon. Make sure to activate the Behavior Pack and Resourc
   <a href="./contribute.md">
     <img src="https://img.shields.io/static/v1?label=&message=Contribute&color=dark+green&style=for-the-badge" alt="Contribute badge">
   </a>
-  <a href="https://github.com/Adr-hyng-OSS/Lumber-Axe/releases">
+  <a href="https://github.com/Adr-hyng-OSS/Better-Laddering/releases">
     <img src="https://img.shields.io/static/v1?label=&message=CHANGELOGS&color=dark+green&style=for-the-badge" alt="Changelogs badge">
   </a>
   <a href="https://bstlar.com/195/Better-Laddering-Bedrock-v1.20.1x">
     <img src="https://img.shields.io/static/v1?label=&message=DOWNLOAD&color=dark+green&style=for-the-badge&logo=download&logoColor=black" alt="Download badge">
   </a>
-  <a href="https://github.com/Adr-hyng-OSS/Lumber-Axe/releases/latest">
+  <a href="https://github.com/Adr-hyng-OSS/Better-Laddering/releases/latest">
     <img src="https://img.shields.io/static/v1?label=&message=LATEST%20RELEASE&color=dark+green&style=for-the-badge" alt="Release badges">
   </a>
 </div>
