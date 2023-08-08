@@ -1,5 +1,5 @@
 import { Block, BlockBreakAfterEvent, BlockPermutation, Dimension, Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, ItemStack, ItemUseOnAfterEvent, MinecraftBlockTypes, MinecraftItemTypes, Player, WatchdogTerminateReason, system, world } from "@minecraft/server";
-import { CContainer, Compare, LadderSupportDirection, debug, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadder, isLadderPart, resolveBlockFaceDirection, setCardinalBlock, setLadderSupport } from "./packages";
+import { CContainer, Compare, LadderSupportDirection, Logger, debug, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadder, isLadderPart, removeCardinalBlockMismatch, resolveBlockFaceDirection, setCardinalBlock, setLadderSupport } from "./packages";
 
 const logMap: Map<string, number> = new Map<string, number>();
 
@@ -63,7 +63,6 @@ world.afterEvents.blockBreak.subscribe(async (event: BlockBreakAfterEvent) => {
 world.beforeEvents.itemUseOn.subscribe((event: ItemUseOnAfterEvent) => {
 		let {block: _blockPlaced, itemStack: itemUsed, blockFace: blockInteractedFace } = event;
 		const player: Player = event.source as Player;
-
     if(itemUsed.typeId !== "minecraft:ladder") return;
 		const oldLog: number = logMap.get(player.name);
     logMap.set(player.name, Date.now());
@@ -72,6 +71,7 @@ world.beforeEvents.itemUseOn.subscribe((event: ItemUseOnAfterEvent) => {
 		const playerCardinalFacing = getCardinalFacing(player.getRotation().y);
 		const {x, y, z} = _blockPlaced.location;
 		const inventory = new CContainer((player.getComponent(EntityInventoryComponent.componentId) as EntityInventoryComponent).container);
+		const preItemAmount = inventory.getItemAmount(MinecraftItemTypes.ladder);
 		system.run(async () => {
 			const blockFace: number | undefined = resolveBlockFaceDirection(blockInteractedFace, _blockPlaced, playerCardinalFacing);
 			if(Direction.up === blockInteractedFace && !player.isSneaking){
@@ -99,6 +99,10 @@ world.beforeEvents.itemUseOn.subscribe((event: ItemUseOnAfterEvent) => {
 					if(!availableBlock) return;
 					if(availableBlock.isSolid() || isInExcludedBlocks(availableBlock.typeId)) return;
 					inventory.clearItem(MinecraftItemTypes.ladder.id, 1);
+					if((preItemAmount - 1) !== inventory.getItemAmount(MinecraftItemTypes.ladder)) {
+						const mismatchError = removeCardinalBlockMismatch(_blockPlaced, blockFace);
+						if(mismatchError) inventory.addItem(MinecraftItemTypes.ladder, mismatchError);
+					}
 					setLadderSupport(availableBlock, blockFace);
 					await new Promise<void>((resolve) => {setCardinalBlock(availableBlock, blockFace, MinecraftBlockTypes.ladder);resolve();});
 				}
@@ -107,6 +111,10 @@ world.beforeEvents.itemUseOn.subscribe((event: ItemUseOnAfterEvent) => {
 					if(!availableBlock) return;
 					if(availableBlock.isSolid() || isInExcludedBlocks(availableBlock.typeId)) return;
 					inventory.clearItem(MinecraftItemTypes.ladder.id, 1);
+					if((preItemAmount - 1) !== inventory.getItemAmount(MinecraftItemTypes.ladder)) {
+						const mismatchError = removeCardinalBlockMismatch(_blockPlaced, blockFace);
+						if(mismatchError) inventory.addItem(MinecraftItemTypes.ladder, mismatchError);
+					}
 					setLadderSupport(availableBlock, blockFace);
 					await new Promise<void>((resolve) => {setCardinalBlock(availableBlock, blockFace, MinecraftBlockTypes.ladder);resolve();});
 				}

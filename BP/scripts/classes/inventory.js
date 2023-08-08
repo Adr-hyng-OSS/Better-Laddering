@@ -1,4 +1,5 @@
 import { ItemStack } from "@minecraft/server";
+import { Compare } from "../packages";
 function stackDistribution(number, groupSize = 64) {
     // Author: Adr-hyng <https://github.com/Adr-hyng>
     // Project: https://github.com/Adr-hyng-OSS/Lumber-Axe
@@ -75,5 +76,18 @@ class CContainer {
             return;
         this._holder.dimension.spawnItem(new ItemStack(itemTypeToAdd, exceededAmount), this._holder.location);
     }
+    getItemAmount(itemToCheck) {
+        let itemAmount = 0;
+        for (let i = 0; i < this.inventory.size; i++) {
+            let item = this.inventory.getItem(i);
+            if (!item)
+                continue;
+            if (!Compare.types.isEqual(item.type, itemToCheck))
+                continue;
+            itemAmount += item.amount;
+        }
+        return itemAmount;
+    }
+    ;
 }
 export { CContainer };

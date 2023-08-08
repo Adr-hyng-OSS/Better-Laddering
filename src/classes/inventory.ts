@@ -1,7 +1,10 @@
 import { Container, ItemStack, ItemType, Player } from "@minecraft/server";
+import { Compare } from "../packages";
 
 interface IContainer {
     addItem(itemTypeToAdd: ItemType, amount: number): void;
+    clearItem(itemId: string, decrement: number): boolean;
+    getItemAmount(itemToCheck: ItemType): number;
 }
 
 function stackDistribution(number: number, groupSize: number = 64): number[] {
@@ -42,7 +45,7 @@ class CContainer implements IContainer {
         this._inventory = newInventory;
     }
 
-    clearItem(itemId: string, decrement: number) {
+    clearItem(itemId: string, decrement: number): boolean {
         const clearSlots = [];
         for (let i = 0; i < this.inventory.size; i++) {
             let item: ItemStack = this.inventory.getItem(i);
@@ -81,6 +84,16 @@ class CContainer implements IContainer {
         if(!exceededAmount) return;
         this._holder.dimension.spawnItem(new ItemStack(itemTypeToAdd, exceededAmount), this._holder.location);
     }
+    getItemAmount(itemToCheck: ItemType): number {
+        let itemAmount = 0;
+        for (let i = 0; i < this.inventory.size; i++) {
+            let item: ItemStack = this.inventory.getItem(i);
+            if (!item) continue;
+            if (!Compare.types.isEqual(item.type, itemToCheck)) continue;
+            itemAmount += item.amount;
+        }
+        return itemAmount;
+    };
 }
 
 

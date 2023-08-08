@@ -104,10 +104,9 @@ function resolveBlockFaceDirection(blockInteractedFace, _blockPlaced, playerCard
             return _blockPlaced.permutation.getState("facing_direction")?.valueOf() ?? defaultValue;
     }
 }
-async function removeCardinalBlockMismatch(block, facingDirection) {
+function removeCardinalBlockMismatch(block, facingDirection) {
     // Not used, but used for clearing up the cardinal block mismatch. (e.g. ladder placed on the side of the wall, then it automatically placed ladder 
     // in other cardinal directions also. Making use of your ladder into such waste.)
-    let successPlaced = 0;
     const { x, y, z } = block.location;
     for (const [faceKey, cardinalPosition] of LadderSupportDirection) {
         const { x: x2, y: y2, z: z2 } = cardinalPosition;
@@ -116,10 +115,10 @@ async function removeCardinalBlockMismatch(block, facingDirection) {
         const _block = block.dimension.getBlock({ x: x + x2, y: y + y2, z: z + z2 });
         if (Compare.types.isEqual(_block.type, block.type)) {
             _block.setType(MinecraftBlockTypes.air);
-            successPlaced++;
+            return 1;
         }
     }
-    return successPlaced;
+    return 0;
 }
 const isLadder = (blockPlaced) => Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.ladder);
 const isLadderPart = (blockPlaced) => (Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.ladder) || Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.get("yn:fake_wall_block")));

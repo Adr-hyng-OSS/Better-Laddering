@@ -1,11 +1,7 @@
 import { BlockPermutation, Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, MinecraftBlockTypes, MinecraftItemTypes, WatchdogTerminateReason, system, world } from "@minecraft/server";
-import { CContainer, Compare, LadderSupportDirection, debug, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadder, isLadderPart, resolveBlockFaceDirection, setCardinalBlock, setLadderSupport } from "./packages";
+import { CContainer, Compare, LadderSupportDirection, debug, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadder, isLadderPart, removeCardinalBlockMismatch, resolveBlockFaceDirection, setCardinalBlock, setLadderSupport } from "./packages";
 const logMap = new Map();
 /**
- * Features:
- * * Currently, it doesn't support not-fully solid block face block, like stairs.
- * * To break all ladders above or below, hold ladder, and destroy a ladder.
- *
  * ? ToDO:
  * * Don't place ladder if there's a block between Other 3 cardinal direction.
  *
@@ -75,6 +71,7 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
     const playerCardinalFacing = getCardinalFacing(player.getRotation().y);
     const { x, y, z } = _blockPlaced.location;
     const inventory = new CContainer(player.getComponent(EntityInventoryComponent.componentId).container);
+    const preItemAmount = inventory.getItemAmount(MinecraftItemTypes.ladder);
     system.run(async () => {
         const blockFace = resolveBlockFaceDirection(blockInteractedFace, _blockPlaced, playerCardinalFacing);
         if (Direction.up === blockInteractedFace && !player.isSneaking) {
@@ -109,6 +106,11 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
                 if (availableBlock.isSolid() || isInExcludedBlocks(availableBlock.typeId))
                     return;
                 inventory.clearItem(MinecraftItemTypes.ladder.id, 1);
+                if ((preItemAmount - 1) !== inventory.getItemAmount(MinecraftItemTypes.ladder)) {
+                    const mismatchError = removeCardinalBlockMismatch(_blockPlaced, blockFace);
+                    if (mismatchError)
+                        inventory.addItem(MinecraftItemTypes.ladder, mismatchError);
+                }
                 setLadderSupport(availableBlock, blockFace);
                 await new Promise((resolve) => { setCardinalBlock(availableBlock, blockFace, MinecraftBlockTypes.ladder); resolve(); });
             }
@@ -119,6 +121,11 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
                 if (availableBlock.isSolid() || isInExcludedBlocks(availableBlock.typeId))
                     return;
                 inventory.clearItem(MinecraftItemTypes.ladder.id, 1);
+                if ((preItemAmount - 1) !== inventory.getItemAmount(MinecraftItemTypes.ladder)) {
+                    const mismatchError = removeCardinalBlockMismatch(_blockPlaced, blockFace);
+                    if (mismatchError)
+                        inventory.addItem(MinecraftItemTypes.ladder, mismatchError);
+                }
                 setLadderSupport(availableBlock, blockFace);
                 await new Promise((resolve) => { setCardinalBlock(availableBlock, blockFace, MinecraftBlockTypes.ladder); resolve(); });
             }
