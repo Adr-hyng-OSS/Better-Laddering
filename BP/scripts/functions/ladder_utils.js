@@ -92,12 +92,12 @@ function resolveBlockFaceDirection(blockInteractedFace, _blockPlaced, playerCard
     // Gets the default blockFace to handle up, down, and sides detection to place the ladder depending on what block face the player is looking at
     // or depending on the player's intereacted block, if it is a ladder, then just get that ladder's facing direction.
     const directionMap = {
-        [Direction.up]: playerCardinalFacing,
-        [Direction.down]: playerCardinalFacing,
-        [Direction.east]: undefined,
-        [Direction.west]: undefined,
-        [Direction.north]: undefined,
-        [Direction.south]: undefined
+        [Direction.Up]: playerCardinalFacing,
+        [Direction.Down]: playerCardinalFacing,
+        [Direction.East]: undefined,
+        [Direction.West]: undefined,
+        [Direction.North]: undefined,
+        [Direction.South]: undefined
     };
     for (const [direction, defaultValue] of Object.entries(directionMap)) {
         if (blockInteractedFace === direction)

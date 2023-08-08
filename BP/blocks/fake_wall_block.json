@@ -117,7 +117,7 @@
       "minecraft:display_name": "tile.yn:fake_wall_block.name",
 			"minecraft:material_instances": {
 				"*": {
-					"texture": "empty",
+					"texture": "debug",
 					"render_method": "alpha_test"
 				}
 			},
@@ -149,10 +149,7 @@
 			"minecraft:destructible_by_explosion": {
         "explosion_resistance": 0.4
       },
-      "minecraft:map_color": "#f0b030",
-      "tag:wood": {},
-      "tag:planks": {},
-      "tag:minecraft:planks": {}
+      "minecraft:map_color": "#f0b030"
     },
     "events": {
 			"update": {
@@ -160,28 +157,28 @@
           {
             "condition": "query.block_property('yn:facing_direction') == 2",
             "run_command": {
-              "command": "execute positioned ~~~ unless block ~~~-1 ladder [\"facing_direction\": 2] run setblock ~~~ air[] replace",
+              "command": "execute positioned ~~~ unless block ~~~-1 ladder [\"facing_direction\" = 2] run setblock ~~~ air[] replace",
               "target": "self"
             }
           },
           {
             "condition": "query.block_property('yn:facing_direction') == 3",
             "run_command": {
-              "command": "execute positioned ~~~ unless block ~~~1 ladder [\"facing_direction\": 3] run setblock ~~~ air[] replace",
+              "command": "execute positioned ~~~ unless block ~~~1 ladder [\"facing_direction\" = 3] run setblock ~~~ air[] replace",
               "target": "self"
             }
           },
           {
             "condition": "query.block_property('yn:facing_direction') == 4",
             "run_command": {
-              "command": "execute positioned ~~~ unless block ~-1~~ ladder [\"facing_direction\": 4] run setblock ~~~ air[] replace",
+              "command": "execute positioned ~~~ unless block ~-1~~ ladder [\"facing_direction\" = 4] run setblock ~~~ air[] replace",
               "target": "self"
             }
           },
           {
             "condition": "query.block_property('yn:facing_direction') == 5",
             "run_command": {
-              "command": "execute positioned ~~~ unless block ~1~~ ladder [\"facing_direction\": 5] run setblock ~~~ air[] replace",
+              "command": "execute positioned ~~~ unless block ~1~~ ladder [\"facing_direction\" = 5] run setblock ~~~ air[] replace",
               "target": "self"
             }
           },

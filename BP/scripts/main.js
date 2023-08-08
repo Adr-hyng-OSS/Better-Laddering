@@ -1,11 +1,6 @@
 import { BlockPermutation, Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, MinecraftBlockTypes, MinecraftItemTypes, WatchdogTerminateReason, system, world } from "@minecraft/server";
 import { CContainer, Compare, LadderSupportDirection, debug, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadder, isLadderPart, removeCardinalBlockMismatch, resolveBlockFaceDirection, setCardinalBlock, setLadderSupport } from "./packages";
 const logMap = new Map();
-/**
- * ? ToDO:
- * * Don't place ladder if there's a block between Other 3 cardinal direction.
- *
- */
 world.afterEvents.blockBreak.subscribe(async (event) => {
     const blockDestroyed = event.block;
     const blockPermutation = event.brokenBlockPermutation;
@@ -74,7 +69,7 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
     const preItemAmount = inventory.getItemAmount(MinecraftItemTypes.ladder);
     system.run(async () => {
         const blockFace = resolveBlockFaceDirection(blockInteractedFace, _blockPlaced, playerCardinalFacing);
-        if (Direction.up === blockInteractedFace && !player.isSneaking) {
+        if (Direction.Up === blockInteractedFace && !player.isSneaking) {
             const initialOffset = (_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId)) ? 1 : 0;
             _blockPlaced = _blockPlaced.dimension.getBlock({ x, y: y + initialOffset, z });
             if (_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId))
@@ -84,7 +79,7 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
             await new Promise((resolve) => { setCardinalBlock(_blockPlaced, blockFace, MinecraftBlockTypes.ladder); resolve(); });
             return;
         }
-        else if (Direction.down === blockInteractedFace) {
+        else if (Direction.Down === blockInteractedFace) {
             const initialOffset = (_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId)) ? 1 : 0;
             _blockPlaced = _blockPlaced.dimension.getBlock({ x, y: y - initialOffset, z });
             if (_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId))
@@ -132,10 +127,10 @@ world.beforeEvents.itemUseOn.subscribe((event) => {
         }
     });
 });
-system.events.beforeWatchdogTerminate.subscribe((event) => {
+system.beforeEvents.watchdogTerminate.subscribe((event) => {
     event.cancel = true;
     // When the world just hanged due to lag spike, then just reset the fishers map.
-    if (event.terminateReason === WatchdogTerminateReason.hang) {
+    if (event.terminateReason === WatchdogTerminateReason.Hang) {
         logMap.forEach((value, key) => {
             logMap.set(key, null);
         });
