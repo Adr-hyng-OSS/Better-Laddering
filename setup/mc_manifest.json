@@ -1,14 +1,14 @@
 {
 	"format_version": 2,
 	"header": {
-		"bp_name": "Better Ladders BP",
-		"rp_name": "Better Ladders RP",
+		"bp_name": "Better Laddering BP",
+		"rp_name": "Better Laddering RP",
 		
-        "description": "Better Ladders: Bedrock Edition\n @Made By: https://twitter.com/h_YanG_0A",
-		
-        "bp_uuid": "958690f0-1e23-4b9b-bd66-b924eaa17a3e",
+		"description": "Better Laddering: Bedrock Edition\n @Made By: https://twitter.com/h_YanG_0A",
+
+		"bp_uuid": "958690f0-1e23-4b9b-bd66-b924eaa17a3e",
 		"rp_uuid": "42979c96-954e-45e5-8f1b-0823cc01eead",
-        "version": [1, 0, 0],
+		"version": [1, 0, 0],
 		"min_engine_version": [ 1, 20, 0 ]
 	},
 	"bp_modules": [

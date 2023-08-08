@@ -1,5 +1,5 @@
-import { Block, BlockBreakAfterEvent, BlockPermutation, Dimension, Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, ItemStack, ItemUseOnAfterEvent, MinecraftBlockTypes, MinecraftItemTypes, NumberRange, Player, Vector, Vector3, system, world } from "@minecraft/server";
-import { CContainer, Compare, LadderSupportDirection, Logger, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadder, isLadderPart, resolveBlockFaceDirection, setCardinalBlock, setLadderSupport } from "./packages";
+import { Block, BlockBreakAfterEvent, BlockPermutation, Dimension, Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, ItemStack, ItemUseOnAfterEvent, MinecraftBlockTypes, MinecraftItemTypes, NumberRange, Player, Vector, Vector3, WatchdogTerminateReason, system, world } from "@minecraft/server";
+import { CContainer, Compare, LadderSupportDirection, Logger, debug, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadder, isLadderPart, resolveBlockFaceDirection, setCardinalBlock, setLadderSupport } from "./packages";
 
 const logMap: Map<string, number> = new Map<string, number>();
 
@@ -118,8 +118,25 @@ world.beforeEvents.itemUseOn.subscribe((event: ItemUseOnAfterEvent) => {
 		});
 });
 
+system.events.beforeWatchdogTerminate.subscribe((event) => {
+  event.cancel = true;
+
+  // When the world just hanged due to lag spike, then just reset the fishers map.
+  if(event.terminateReason === WatchdogTerminateReason.hang){
+    logMap.forEach((value, key) => {
+      logMap.set(key, null);
+    });
+    
+    // For disabling the watchdog custom terminate log.
+    if(!debug) world.sendMessage({translate: `BetterLaddering.watchdogError.hang.text`});
+    if(debug) console.warn("Scripting Error: The script was resetted because it was consuming too much. Please report why this happened to the creator.");
+	}
+});
+
 
 world.beforeEvents.chatSend.subscribe((event) => {
+	event.cancel = true;
+	if(!debug) return;
 	const prefix = "-";
 	let player = event.sender;
   let message = event.message;

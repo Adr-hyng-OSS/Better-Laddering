@@ -114,6 +114,7 @@
       "minecraft:on_player_placing": {
         "event": "set_facing_direction"
       },
+      "minecraft:display_name": "tile.yn:fake_wall_block.name",
 			"minecraft:material_instances": {
 				"*": {
 					"texture": "empty",

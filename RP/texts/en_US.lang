@@ -1,0 +1,3 @@
+tile.yn:fake_wall_block.name=Ladder Support
+
+BetterLaddering.watchdogError.hang.text=Scripting Error: The script was resetted because it was consuming too much. Please report why this happened to the creator.
