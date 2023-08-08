@@ -78,7 +78,7 @@ world.beforeEvents.itemUseOn.subscribe((event: ItemUseOnAfterEvent) => {
 		const inventory = new CContainer((player.getComponent(EntityInventoryComponent.componentId) as EntityInventoryComponent).container);
 		system.run(async () => {
 			const blockFace: number | undefined = resolveBlockFaceDirection(blockInteractedFace, _blockPlaced, playerCardinalFacing);
-			if(Direction.up === blockInteractedFace){
+			if(Direction.up === blockInteractedFace && !player.isSneaking){
 				const initialOffset = (_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId)) ? 1 : 0;
 				_blockPlaced = _blockPlaced.dimension.getBlock({x, y: y + initialOffset, z});
 				if(_blockPlaced.isSolid() || isInExcludedBlocks(_blockPlaced.typeId)) return;
@@ -134,48 +134,48 @@ system.events.beforeWatchdogTerminate.subscribe((event) => {
 });
 
 
-world.beforeEvents.chatSend.subscribe((event) => {
-	event.cancel = true;
-	if(!debug) return;
-	const prefix = "-";
-	let player = event.sender;
-  let message = event.message;
-  const args = message.trim().slice(prefix.length).split(/\s+/g);
-  const command = args[0];
-  if (command !== "fill") return;
+// world.beforeEvents.chatSend.subscribe((event) => {
+// 	if(!debug) return;
+// 	event.cancel = true;
+// 	const prefix = "-";
+// 	let player = event.sender;
+//   let message = event.message;
+//   const args = message.trim().slice(prefix.length).split(/\s+/g);
+//   const command = args[0];
+//   if (command !== "fill") return;
   
-  const amountToFill = parseInt(args[1].replace(/[^0-9.-]/g, ''), 10);
-  if (isNaN(amountToFill)) {
-    Logger.warn('Invalid amount to fill.');
-    return;
-  }
+//   const amountToFill = parseInt(args[1].replace(/[^0-9.-]/g, ''), 10);
+//   if (isNaN(amountToFill)) {
+//     Logger.warn('Invalid amount to fill.');
+//     return;
+//   }
 
-  let blocksFilled = 0;
-  let blockFacing = player.getBlockFromViewDirection({maxDistance: 10});
-  const {y: yRot} = player.getRotation();
-  const playerCardinalFacing = getCardinalFacing(yRot);
-  const {x, y, z} = blockFacing.location;
+//   let blocksFilled = 0;
+//   let blockFacing = player.getBlockFromViewDirection({maxDistance: 10});
+//   const {y: yRot} = player.getRotation();
+//   const playerCardinalFacing = getCardinalFacing(yRot);
+//   const {x, y, z} = blockFacing.location;
 
-  const initialOffset = blockFacing.isSolid() && !isInExcludedBlocks(blockFacing.typeId) ? 1 : 0;
-  blockFacing = blockFacing.dimension.getBlock({x, y: y + initialOffset, z});
-  if(isLadderPart(blockFacing.type) || blockFacing.isSolid() || isInExcludedBlocks(blockFacing.typeId)) return;
-	system.run(async () => {
-		setLadderSupport(blockFacing, playerCardinalFacing);
-		setCardinalBlock(blockFacing, playerCardinalFacing, MinecraftBlockTypes.ladder);
+//   const initialOffset = blockFacing.isSolid() && !isInExcludedBlocks(blockFacing.typeId) ? 1 : 0;
+//   blockFacing = blockFacing.dimension.getBlock({x, y: y + initialOffset, z});
+//   if(isLadderPart(blockFacing.type) || blockFacing.isSolid() || isInExcludedBlocks(blockFacing.typeId)) return;
+// 	system.run(async () => {
+// 		setLadderSupport(blockFacing, playerCardinalFacing);
+// 		setCardinalBlock(blockFacing, playerCardinalFacing, MinecraftBlockTypes.ladder);
 		
-		await new Promise<void>((resolve) => {
-			for (let i = blocksFilled; i < amountToFill; i++) {
-				const availableBlock: Block = getBlockFromRayFiltered(blockFacing, {x: 0, y: 1, z: 0}, {filteredBlocks: MinecraftBlockTypes.ladder});
-				if(!availableBlock || availableBlock.isSolid() || isInExcludedBlocks(availableBlock.typeId)) return;
+// 		await new Promise<void>((resolve) => {
+// 			for (let i = blocksFilled; i < amountToFill; i++) {
+// 				const availableBlock: Block = getBlockFromRayFiltered(blockFacing, {x: 0, y: 1, z: 0}, {filteredBlocks: MinecraftBlockTypes.ladder});
+// 				if(!availableBlock || availableBlock.isSolid() || isInExcludedBlocks(availableBlock.typeId)) return;
 				
-				setLadderSupport(availableBlock, playerCardinalFacing);
-				setCardinalBlock(availableBlock, playerCardinalFacing, MinecraftBlockTypes.ladder);
+// 				setLadderSupport(availableBlock, playerCardinalFacing);
+// 				setCardinalBlock(availableBlock, playerCardinalFacing, MinecraftBlockTypes.ladder);
 	
-				blockFacing = blockFacing.dimension.getBlock({x, y: blockFacing.y + 1, z});
-				blocksFilled++;
-			}
-			Logger.warn(`Filled ${blocksFilled} blocks.`);
-			resolve();
-		});
-	});
-});
+// 				blockFacing = blockFacing.dimension.getBlock({x, y: blockFacing.y + 1, z});
+// 				blocksFilled++;
+// 			}
+// 			Logger.warn(`Filled ${blocksFilled} blocks.`);
+// 			resolve();
+// 		});
+// 	});
+// });
