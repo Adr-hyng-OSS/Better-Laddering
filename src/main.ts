@@ -1,13 +1,9 @@
-import { Block, BlockBreakAfterEvent, BlockPermutation, Dimension, Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, ItemStack, ItemUseOnAfterEvent, MinecraftBlockTypes, MinecraftItemTypes, NumberRange, Player, Vector, Vector3, WatchdogTerminateReason, system, world } from "@minecraft/server";
-import { CContainer, Compare, LadderSupportDirection, Logger, debug, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadder, isLadderPart, resolveBlockFaceDirection, setCardinalBlock, setLadderSupport } from "./packages";
+import { Block, BlockBreakAfterEvent, BlockPermutation, Dimension, Direction, EntityEquipmentInventoryComponent, EntityInventoryComponent, EquipmentSlot, ItemStack, ItemUseOnAfterEvent, MinecraftBlockTypes, MinecraftItemTypes, Player, WatchdogTerminateReason, system, world } from "@minecraft/server";
+import { CContainer, Compare, LadderSupportDirection, debug, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadder, isLadderPart, resolveBlockFaceDirection, setCardinalBlock, setLadderSupport } from "./packages";
 
 const logMap: Map<string, number> = new Map<string, number>();
 
 /**
- * Features:
- * * Currently, it doesn't support not-fully solid block face block, like stairs.
- * * To break all ladders above or below, hold ladder, and destroy a ladder.
- * 
  * ? ToDO:
  * * Don't place ladder if there's a block between Other 3 cardinal direction.
  * 
