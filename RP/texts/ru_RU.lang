@@ -1,0 +1,5 @@
+## Block
+tile.yn:fake_wall_block.name=Поддержка лестницы
+
+## Error Message
+BetterLaddering.watchdogError.hang.text=Ошибка сценария: сценарий был сброшен, так как он слишком много потреблял. Пожалуйста, сообщите создателю, почему это произошло.

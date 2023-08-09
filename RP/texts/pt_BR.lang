@@ -1,0 +1,5 @@
+## Block
+tile.yn:fake_wall_block.name=Suporte de Escada
+
+## Error Message
+BetterLaddering.watchdogError.hang.text=Erro de script: o script foi redefinido porque estava consumindo muito. Por favor, informe por que isso aconteceu ao criador.
