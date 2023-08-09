@@ -1,0 +1,5 @@
+## Block
+tile.yn:fake_wall_block.name=Support d'échelle
+
+## Error Message
+BetterLaddering.watchdogError.hang.text=Erreur de script : le script a été réinitialisé car il consommait trop. Veuillez indiquer pourquoi cela est arrivé au créateur.

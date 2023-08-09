@@ -1,0 +1,5 @@
+## Block
+tile.yn:fake_wall_block.name=Soporte de escalera
+
+## Error Message
+BetterLaddering.watchdogError.hang.text=Error de secuencias de comandos: la secuencia de comandos se restableció porque consumía demasiado. Informa por qué le sucedió esto al creador.
