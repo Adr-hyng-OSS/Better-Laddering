@@ -2,8 +2,8 @@
 
 <div align="center">
 
-  ![DevelopmentStatus](https://img.shields.io/badge/Development-finished-2ea44f?logo=visualstudiocode&logoColor=blue)
-  ![Version](https://img.shields.io/badge/Version-v1.0.0-2ea44f?logo=git&logoColor=red)
+  ![DevelopmentStatusManual](https://img.shields.io/badge/Development-finished-2ea44f?logo=visualstudiocode&logoColor=blue)
+  ![VersionManual](https://img.shields.io/badge/Version-v1.0.1-2ea44f?logo=git&logoColor=red)
   [![TwitterLink](https://img.shields.io/badge/Twitter-Follow_@h__YanG__0A-2ea44f?logo=twitter&logoColor=blue)](https://twitter.com/h_YanG_0A)
   [![PaypalLink](https://img.shields.io/badge/Support-Donate-2ea44f?logo=paypal)](https://www.paypal.com/paypalme/DennisAbaigar?country.x=PH&locale.x=en_US)
   ![Minecraft BE Addon Latest Release](https://img.shields.io/github/v/release/Adr-hyng-OSS/Better-Laddering?logo=xbox&logoColor=green&label=Minecraft)
@@ -22,6 +22,8 @@
 <br>
 
 <h1 align="center" >🎮 <a href="https://youtube.com/playlist?list=PLHMbEPQsIZ9zJ6dVAVO0E1YM5qgYO1iQI"><strong>Showcase</strong> </a> 🎮</h1>
+
+<p align="center"><img src="./res/demo/Ladder-Floor-and-Ceiling.gif" alt="Demonstration GIF"></p>
 
 ## 🕹️ *In-Game:*
 
