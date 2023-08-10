@@ -117,7 +117,7 @@
       "minecraft:display_name": "tile.yn:fake_wall_block.name",
 			"minecraft:material_instances": {
 				"*": {
-					"texture": "debug",
+					"texture": "empty",
 					"render_method": "alpha_test"
 				}
 			},
