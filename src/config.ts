@@ -2,7 +2,7 @@ export default {
   /**
    * Enables debug messages to content logs.
    */
-  debug: false,
+  debug: true,
   /**
    * Allow's ladders to replace non-fully solid face blocks like stairs, doors, etc. Here's a list of blocks that can be forced destroyed when placing ladder above, and back of ladder as support:
    * 1. .*_fence
