@@ -1,10 +1,14 @@
-import { Container, ItemStack, ItemType, Player } from "@minecraft/server";
-import { Compare } from "../packages";
+import { Container, EntityEquippableComponent, EquipmentSlot, ItemStack, ItemType, Player } from "@minecraft/server";
+import { Logger } from "./logger";
 
-interface IContainer {
-    addItem(itemTypeToAdd: ItemType, amount: number): void;
-    clearItem(itemId: string, decrement: number): boolean;
-    getItemAmount(itemToCheck: ItemType): number;
+declare module "@minecraft/server" {
+    interface Container {
+        readonly holder: Player;
+        getItemAmount(this: Container, itemToCheck: ItemType): number;
+        clearItem(this: Container, itemId: string, decrement: number): boolean;
+        giveItem(itemTypeToAdd: ItemType, amount: number): void;
+        setHolder(holder: Player): Container;
+    }
 }
 
 function stackDistribution(number: number, groupSize: number = 64): number[] {
@@ -22,80 +26,70 @@ function stackDistribution(number: number, groupSize: number = 64): number[] {
     return groups;
 }
 
-
-
-class CContainer implements IContainer {
-    private _inventory: Container;
-    private _holder: Player;
-
-    constructor(inventory: Container) {
-        this._inventory = inventory;
-    }
-
-    setPlayer(newHolder: Player): CContainer {
-        this._holder = newHolder;
-        return this;
-    }
-
-    get inventory() {
-        return this._inventory;
-    }
-
-    set inventory(newInventory: Container) {
-        this._inventory = newInventory;
-    }
-
-    clearItem(itemId: string, decrement: number): boolean {
-        const clearSlots = [];
-        for (let i = 0; i < this.inventory.size; i++) {
-            let item: ItemStack = this.inventory.getItem(i);
-            if (item?.typeId !== itemId) continue;
-            if (decrement - item.amount > 0) {
-                decrement -= item.amount;
-                clearSlots.push(i);
-                continue;
-            }; clearSlots.forEach(s => this.inventory.setItem(s));
-            if (decrement - item.amount === 0) {
-                this.inventory.setItem(i);
-                return true;
-            }; item.amount -= decrement;
-            this.inventory.setItem(i, item);
-            return true;
-        }; return false;
-    };
-
-    public addItem(itemTypeToAdd: ItemType, amount: number): void {
-        // Author: Adr-hyng <https://github.com/Adr-hyng>
-        // Project: https://github.com/Adr-hyng-OSS/Lumber-Axe
-        // Behaves similar to "Give" command.
-        if(!amount) return;
-        const item = new ItemStack(itemTypeToAdd);
-        let exceededAmount: number = 0;
-        if(amount > item.maxAmount){
-            const groupStacks = stackDistribution(amount, item.maxAmount);
-            groupStacks.forEach(stack => {
-                item.amount = stack;
-                exceededAmount += this.inventory.addItem(item)?.amount ?? 0;
-            });
-        } else {
-            item.amount = amount;
-            exceededAmount = this.inventory.addItem(item)?.amount ?? exceededAmount;
-        }
-        if(!exceededAmount) return;
-        this._holder.dimension.spawnItem(new ItemStack(itemTypeToAdd, exceededAmount), this._holder.location);
-    }
-    getItemAmount(itemToCheck: ItemType): number {
-        let itemAmount = 0;
-        for (let i = 0; i < this.inventory.size; i++) {
-            let item: ItemStack = this.inventory.getItem(i);
-            if (!item) continue;
-            if (!Compare.types.isEqual(item.type, itemToCheck)) continue;
-            itemAmount += item.amount;
-        }
-        return itemAmount;
-    };
+Container.prototype.getItemAmount = function(itemToCheck: ItemType): number {
+	let itemAmount = 0;
+	for (let i = 0; i < this.size; i++) {
+		this
+		let item: ItemStack = this.getItem(i);
+		if (!item) continue;
+		if (item.type !== itemToCheck) continue;
+		itemAmount += item.amount;
+	}
+	return itemAmount;
 }
 
+Container.prototype.clearItem = function(itemId: string, decrement: number): boolean {
+    const clearSlots = [];
+    const equipment = (this.holder.getComponent(EntityEquippableComponent.componentId) as EntityEquippableComponent);
+    const offhand = equipment.getEquipment(EquipmentSlot.Offhand);
+    for (let i = 0; i < this.size; i++) {
+        let item: ItemStack = this.getItem(i);
+        if (item?.typeId !== itemId) continue;
+        if (decrement - item.amount > 0) {
+            decrement -= item.amount;
+            clearSlots.push(i);
+            continue;
+        }; clearSlots.forEach(s => this.setItem(s));
+        if (decrement - item.amount === 0) {
+            this.setItem(i);
+            return true;
+        }; item.amount -= decrement;
+        this.setItem(i, item);
+        return true;
+    }; 
+    if(offhand?.typeId === itemId) {
+        if(offhand?.amount - decrement === 0) {
+            equipment.setEquipment(EquipmentSlot.Offhand, undefined);
+            return true;
+        }
+        if(offhand?.amount - decrement > 0) {
+            offhand.amount -= decrement;
+            equipment.setEquipment(EquipmentSlot.Offhand, offhand);
+            return true;
+        }
+    }
+    return false;
+}
 
+Container.prototype.setHolder = function(holder: Player): Container {
+    this.holder = holder;
+    return this;
+}
 
-export {CContainer}
+Container.prototype.giveItem = function(itemTypeToAdd: ItemType, amount: number): void {
+    if(!amount) return;
+    const item = new ItemStack(itemTypeToAdd);
+    let exceededAmount: number = 0;
+    if(amount > item.maxAmount){
+        const groupStacks = stackDistribution(amount, item.maxAmount);
+        groupStacks.forEach(stack => {
+            item.amount = stack;
+            exceededAmount += this.addItem(item)?.amount ?? 0;
+        });
+    } else {
+        item.amount = amount;
+        exceededAmount = this.addItem(item)?.amount ?? exceededAmount;
+    }
+    if(!exceededAmount) return;
+    this.holder.dimension.spawnItem(new ItemStack(itemTypeToAdd, exceededAmount), this.holder.location);
+}

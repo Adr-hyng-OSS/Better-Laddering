@@ -6,8 +6,6 @@ export * from "./functions/utils";
 export * from "./classes/inventory";
 export * from "./functions/compare_utils";
 
-
-
 const {
     debug, 
     disableLadderGriefing,
