@@ -1,4 +1,5 @@
-import { Block, BlockPermutation, BlockType, Direction, MinecraftBlockTypes, Vector, Vector3 } from "@minecraft/server";
+import { Block, BlockPermutation, BlockType, Direction, Vector, Vector3 } from "@minecraft/server";
+import { MinecraftBlockTypes} from "../modules/vanilla-types/index";
 import { Compare, Logger, disableLadderGriefing, griefableBlocks, nonGriefableBlocks } from "../packages";
 
 const LadderSupportDirection: Map<number, Vector3> = new Map([
@@ -79,9 +80,9 @@ function setCardinalBlock(block: Block, face: number, blockReplace: BlockType): 
     if(isOutofBuildLimit(block.location.y)) {
         throw new Error("Stackable Ladder: Cannot place block out of build limit.");
     }
-    const facing_direction_selector = (blockReplace === MinecraftBlockTypes.ladder) ? "facing_direction" : "yn:facing_direction";
+    const facing_direction_selector = (blockReplace === MinecraftBlockTypes.Ladder) ? "facing_direction" : "yn:facing_direction";
     block.setType(blockReplace);
-    if(Compare.types.isEqual(block.type, MinecraftBlockTypes.air)) return;
+    if(Compare.types.isEqual(block.type, MinecraftBlockTypes.Air)) return;
     const perm: BlockPermutation = BlockPermutation.resolve(block.typeId).withState(facing_direction_selector, face);
     block.setPermutation(perm);
 }
@@ -90,7 +91,7 @@ function setLadderSupport(block: Block, face: number): void {
     const directionOffset = LadderSupportDirection.get(face);
     const supportOffset: Vector3 = Vector.add(block.location, directionOffset);
     const supportBlock = block.dimension.getBlock(supportOffset);
-    if(!supportBlock.isSolid() && !isInExcludedBlocks(supportBlock.typeId)){
+    if(!supportBlock.isSolid && !isInExcludedBlocks(supportBlock.typeId)){
         setCardinalBlock(supportBlock, face, MinecraftBlockTypes.get("yn:fake_wall_block"));
     }
 }
@@ -119,16 +120,16 @@ function removeCardinalBlockMismatch(block: Block, facingDirection: number): num
         if (Compare.types.isEqual(faceKey, facingDirection)) continue;
         const _block: Block = block.dimension.getBlock({x: x + x2, y: y + y2, z: z + z2});
         if(Compare.types.isEqual(_block.type, block.type)) {
-            _block.setType(MinecraftBlockTypes.air);
+            _block.setType(MinecraftBlockTypes.Air);
             return 1;
         }
     }
     return 0;
 }
 
-const isLadder = (blockPlaced: BlockType) => Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.ladder);
+const isLadder = (blockPlaced: BlockType) => Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.Ladder);
 
-const isLadderPart = (blockPlaced: BlockType) => (Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.ladder) || Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.get("yn:fake_wall_block")));
+const isLadderPart = (blockPlaced: BlockType) => (Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.Ladder) || Compare.types.isEqual(blockPlaced, MinecraftBlockTypes.get("yn:fake_wall_block")));
 
 const isOutofBuildLimit = (y: number): boolean => (y >= 319 || y <= -64);
 
