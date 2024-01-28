@@ -2,7 +2,6 @@ import { BlockPermutation, Direction, EntityEquippableComponent, EntityInventory
 import { MinecraftBlockTypes, MinecraftItemTypes } from "./modules/vanilla-types/index";
 import { Compare, LadderSupportDirection, debug, getBlockFromRayFiltered, getCardinalFacing, isInExcludedBlocks, isLadder, isLadderPart, removeCardinalBlockMismatch, resolveBlockFaceDirection, setCardinalBlock, setLadderSupport } from "./packages";
 const logMap = new Map();
-world.afterEvents.playerBreakBlock;
 world.afterEvents.playerBreakBlock.subscribe(async (event) => {
     const blockDestroyed = event.block;
     const blockPermutation = event.brokenBlockPermutation;

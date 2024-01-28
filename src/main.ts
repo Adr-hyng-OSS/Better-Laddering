@@ -4,7 +4,6 @@ import { Compare, LadderSupportDirection, Logger, debug, getBlockFromRayFiltered
 
 const logMap: Map<string, number> = new Map<string, number>();
 
-world.afterEvents.playerBreakBlock
 world.afterEvents.playerBreakBlock.subscribe(async (event: PlayerBreakBlockAfterEvent) => {
     const blockDestroyed: Block = event.block;
     const blockPermutation: BlockPermutation = event.brokenBlockPermutation;
